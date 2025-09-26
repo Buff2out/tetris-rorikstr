@@ -58,8 +58,41 @@ typedef enum {
 
 // Основные функции библиотеки
 void user_input(UserAction_t action);
+static bool check_collision();
 GameStateData* get_game_state(void);
 
 const int (*get_figure_shape(FigureType type, int rotation))[4];
+
+const int (*i_fig_up())[4];
+const int (*i_fig_right())[4];
+const int (*i_fig_down())[4];
+const int (*i_fig_left())[4];
+
+const int (*o_fig())[4];
+
+const int (*t_fig_up())[4];
+const int (*t_fig_right())[4];
+const int (*t_fig_down())[4];
+const int (*t_fig_left())[4];
+
+const int (*l_fig_up())[4];
+const int (*l_fig_right())[4];
+const int (*l_fig_down())[4];
+const int (*l_fig_left())[4];
+
+const int (*j_fig_up())[4];
+const int (*j_fig_right())[4];
+const int (*j_fig_down())[4];
+const int (*j_fig_left())[4];
+
+const int (*s_fig_up())[4];
+const int (*s_fig_right())[4];
+const int (*s_fig_down())[4];
+const int (*s_fig_left())[4];
+
+const int (*z_fig_up())[4];
+const int (*z_fig_right())[4];
+const int (*z_fig_down())[4];
+const int (*z_fig_left())[4];
 
 #endif

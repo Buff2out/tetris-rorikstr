@@ -17,9 +17,8 @@ int main() {
     timeout(100);  // Таймаут для getch()
 
     int ch;
-    bool hold = false;
     UserAction_t action = Undefined;
-    while (!Terminate) {
+    while (action != Terminate) {
         ch = getch();
         
 

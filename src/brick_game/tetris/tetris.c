@@ -8,7 +8,7 @@ static GameStateData game_state = {0};
 static bool initialized = false;
 
 const int (*get_figure_shape(FigureType type, int rotation))[4] {
-  static const int shapes[FIGURE_COUNT][4][4][4] = {
+  static const int shapes[FIGURE_COUNT + 1][4][4][4] = {
     // I
     {
       {
@@ -222,6 +222,6 @@ void user_input(UserAction_t action) {
     }
 }
 
-GameStateData* getGameState() {
+GameStateData* get_game_state() {
     return &game_state;
 }

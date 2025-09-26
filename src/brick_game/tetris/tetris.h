@@ -1,13 +1,13 @@
+// src/brick_game/tetris/tetris.h
 #ifndef TETRIS_H
 #define TETRIS_H
 
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 // Константы
 #define FIELD_WIDTH 10
 #define FIELD_HEIGHT 20
-#define NEXT_SIZE 4
 
 // Типы фигур
 typedef enum {
@@ -21,16 +21,6 @@ typedef enum {
     FIGURE_COUNT
 } FigureType;
 
-// Состояния конечного автомата
-typedef enum {
-    START,
-    SPAWN,
-    MOVING,
-    SHIFTING,
-    ATTACHING,
-    GAME_OVER
-} GameState;
-
 // Структура фигуры
 typedef struct {
     int x, y;           // Позиция фигуры на поле
@@ -42,30 +32,31 @@ typedef struct {
 typedef struct {
     int field[FIELD_HEIGHT][FIELD_WIDTH];  // Игровое поле
     Figure current_figure;                 // Текущая фигура
-    Figure next_figure;                    // Следующая фигура
-    int score;                             // Текущие очки
-    int high_score;                        // Максимальные очки
-    int level;                             // Уровень
-    int lines_cleared;                     // Удалённые линии
-    GameState state;                       // Текущее состояние КА
-    bool paused;                           // Игра на паузе?
+    bool figure_active;                    // Есть активная фигура?
 } GameStateData;
 
 // Ввод пользователя
 typedef enum {
+    Undefined = -1,
     Start,
     Pause,
     Terminate,
     Left,
     Right,
-    Up,      // не используется
+    Up,
     Down,
-    Action   // вращение
+    Action,
+    Figure1,  // 1
+    Figure2,  // 2
+    Figure3,  // 3
+    Figure4,  // 4
+    Figure5   // 5
 } UserAction_t;
 
 // Основные функции библиотеки
 void userInput(UserAction_t action, bool hold);
 GameStateData* getGameState(void);
-void updateCurrentState(void);
+
+const int (*get_figure_shape(FigureType type, int rotation))[4];
 
 #endif

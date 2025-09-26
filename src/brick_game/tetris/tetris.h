@@ -57,7 +57,7 @@ typedef enum {
 
 // Основные функции библиотеки
 void user_input(UserAction_t action);
-GameStateData* getGameState(void);
+GameStateData* get_game_state(void);
 
 const int (*get_figure_shape(FigureType type, int rotation))[4];
 

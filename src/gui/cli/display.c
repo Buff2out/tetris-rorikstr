@@ -5,7 +5,7 @@
 void display_game() {
     clear();
 
-    GameStateData* state = getGameState();
+    GameStateData* state = get_game_state();
 
     // Очистка поля
     for (int i = 0; i < FIELD_HEIGHT; i++) {

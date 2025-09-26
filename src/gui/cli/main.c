@@ -18,10 +18,10 @@ int main() {
 
     int ch;
     bool hold = false;
-
-    while (1) {
+    UserAction_t action = Undefined;
+    while (!Terminate) {
         ch = getch();
-        UserAction_t action = Undefined;
+        
 
         switch (ch) {
             case 'q': action = Terminate; break;
@@ -43,8 +43,6 @@ int main() {
         }
 
         display_game();
-
-        if (action == Terminate) break;
     }
 
     endwin();

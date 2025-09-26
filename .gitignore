@@ -50,4 +50,5 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
-src/tetris
+src/project.md
+src/tetris_bin

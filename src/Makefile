@@ -11,7 +11,7 @@ CLI_SRC = $(CLIDIR)/main.c $(CLIDIR)/display.c
 OBJ = $(TETRIS_SRC:.c=.o) $(CLI_SRC:.c=.o)
 
 # Имя исполняемого файла
-TARGET = tetris
+TARGET = tetris_bin
 
 # Установка
 PREFIX ?= /usr/local

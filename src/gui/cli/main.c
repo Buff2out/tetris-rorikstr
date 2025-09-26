@@ -18,9 +18,8 @@ int main() {
 
     int ch;
     UserAction_t action = Undefined;
-    while (action != Terminate) {
+    while (Terminate != action) {
         ch = getch();
-        
 
         switch (ch) {
             case 'q': action = Terminate; break;
@@ -31,10 +30,13 @@ int main() {
             case '5': action = Figure5; break;
             case '6': action = Figure6; break;
             case '7': action = Figure7; break;
+            case 'r': action = Rotate; break;
+            case ' ': action = Rotate; break;
             case KEY_LEFT: action = Left; break;
             case KEY_RIGHT: action = Right; break;
             case KEY_DOWN: action = Down; break;
             case KEY_UP: action = Up; break;
+            default: action = Undefined;
         }
 
         if (action != Undefined) {

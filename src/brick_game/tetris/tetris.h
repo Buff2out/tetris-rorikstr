@@ -45,6 +45,7 @@ typedef enum {
     Right,
     Up,
     Down,
+    Rotate,
     Action,
     Figure1,
     Figure2,

@@ -46,15 +46,17 @@ typedef enum {
     Up,
     Down,
     Action,
-    Figure1,  // 1
-    Figure2,  // 2
-    Figure3,  // 3
-    Figure4,  // 4
-    Figure5   // 5
+    Figure1,
+    Figure2,
+    Figure3,
+    Figure4,
+    Figure5,
+    Figure6,
+    Figure7
 } UserAction_t;
 
 // Основные функции библиотеки
-void userInput(UserAction_t action, bool hold);
+void user_input(UserAction_t action);
 GameStateData* getGameState(void);
 
 const int (*get_figure_shape(FigureType type, int rotation))[4];

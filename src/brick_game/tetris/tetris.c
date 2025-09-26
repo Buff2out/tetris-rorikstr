@@ -47,14 +47,13 @@ const int (*get_figure_shape(FigureType type, int rotation))[4] {
   return shapes[type][rotation];
 }
 
-void userInput(UserAction_t action, bool hold) {
-    (void)hold;  // Подавляем предупреждение
+void user_input(UserAction_t action) {
     if (!initialized) {
         memset(&game_state, 0, sizeof(game_state));
         initialized = true;
     }
 
-    if (action >= Figure1 && action <= Figure5) {
+    if (action >= Figure1 && action <= Figure7) {
         FigureType type = (FigureType)(action - Figure1);
         game_state.current_figure.type = type;
         game_state.current_figure.x = FIELD_WIDTH / 2 - 2;

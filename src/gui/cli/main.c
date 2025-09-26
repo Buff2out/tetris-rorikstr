@@ -30,6 +30,8 @@ int main() {
             case '3': action = Figure3; break;
             case '4': action = Figure4; break;
             case '5': action = Figure5; break;
+            case '6': action = Figure6; break;
+            case '7': action = Figure7; break;
             case KEY_LEFT: action = Left; break;
             case KEY_RIGHT: action = Right; break;
             case KEY_DOWN: action = Down; break;
@@ -37,7 +39,7 @@ int main() {
         }
 
         if (action != Undefined) {
-            userInput(action, hold);
+            user_input(action);
         }
 
         display_game();

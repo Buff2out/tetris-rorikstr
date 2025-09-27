@@ -53,3 +53,6 @@ dkms.conf
 src/project.md
 src/tetris_bin
 src/.gpskip
+.gpskip
+ginpee.toml
+src/ginpee.toml

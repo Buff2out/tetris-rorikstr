@@ -28,14 +28,12 @@ typedef struct {
     int rotation;       // Поворот (0–3)
 } Figure;
 
-// Структура состояния игры
 typedef struct {
     int field[FIELD_HEIGHT][FIELD_WIDTH];  // Игровое поле
     Figure current_figure;                 // Текущая фигура
     bool figure_active;                    // Есть активная фигура?
 } GameStateData;
 
-// Ввод пользователя
 typedef enum {
     Undefined = -1,
     Start,
@@ -56,7 +54,6 @@ typedef enum {
     Figure7
 } UserAction_t;
 
-// Основные функции библиотеки
 void user_input(UserAction_t action);
 static bool check_collision();
 GameStateData* get_game_state(void);

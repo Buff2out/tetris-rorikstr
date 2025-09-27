@@ -107,7 +107,7 @@ GameStateData* get_game_state() {
     return &game_state;
 }
 
-static bool check_collision() {
+bool check_collision() {
     Figure* f = &game_state.current_figure;
     const int (*shape)[4] = get_figure_shape(f->type, f->rotation);
 

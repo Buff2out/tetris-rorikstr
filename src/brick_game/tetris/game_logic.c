@@ -5,8 +5,6 @@
 #include <string.h>
 #include <time.h>
 
-// static bool initialized = false;
-
 static GameStateData* get_instance() {
     static GameStateData instance = {0};
     static bool initialized_local = false;
@@ -21,8 +19,7 @@ static GameStateData* get_instance() {
         instance.score = 0;
         instance.high_score = 0;
         instance.level = 1;
-        instance.speed = 1000;
-        instance.figure_active = false;
+        instance.state = FSM_Start;
         instance.game_over = false;
         instance.paused = false;
         initialized_local = true;
@@ -43,27 +40,45 @@ void init_game() {
     
     srand((unsigned int)time(NULL));
     
-    state->current_figure.type = get_random_figure();
-    state->current_figure.x = FIELD_WIDTH / 2 - 2;
-    state->current_figure.y = 0;
-    state->current_figure.rotation = 0;
-    
     state->next_figure.type = get_random_figure();
     state->next_figure.x = 0;
     state->next_figure.y = 0;
     state->next_figure.rotation = 0;
     
-    state->figure_active = true;
     state->score = 0;
-    state->high_score = 0;  // Позже можно загружать из файла
+    state->high_score = 0;
     state->level = 1;
-    state->speed = 1000;
     state->drop_time = time(NULL) * 1000;
     state->game_over = false;
     state->paused = false;
+    state->state = FSM_Start;
 }
 
-static void clear_completed_lines() {
+void place_figure() {
+    GameStateData* state = get_instance();
+    Figure* f = &state->current_figure;
+    const int (*shape)[4] = get_figure_shape(f->type, f->rotation);
+
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            if (shape[i][j]) {
+                int x = f->x + j;
+                int y = f->y + i;
+                if (y >= 0 && y < FIELD_HEIGHT && x >= 0 && x < FIELD_WIDTH) {
+                    state->game_field[y][x] = 1;
+                }
+            }
+        }
+    }
+    
+    // Проверяем и удаляем заполненные строки
+    clear_completed_lines();
+    
+    // Меняем состояние на Spawn для генерации новой фигуры
+    state->state = FSM_Spawn;
+}
+
+void clear_completed_lines() {
     GameStateData* state = get_instance();
     int lines_cleared = 0;
     int write_row = FIELD_HEIGHT - 1;
@@ -118,9 +133,6 @@ static void clear_completed_lines() {
         if (new_level > 10) new_level = 10;
         if (new_level != state->level) {
             state->level = new_level;
-            // Увеличиваем скорость (уменьшаем время падения)
-            state->speed = 1000 - (state->level - 1) * 50;
-            if (state->speed < 100) state->speed = 100;
         }
     }
 }
@@ -151,63 +163,50 @@ bool check_collision() {
     return collision;
 }
 
-void place_figure() {
+void fsm_transition() {
     GameStateData* state = get_instance();
-    Figure* f = &state->current_figure;
-    const int (*shape)[4] = get_figure_shape(f->type, f->rotation);
-
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            if (shape[i][j]) {
-                int x = f->x + j;
-                int y = f->y + i;
-                if (y >= 0 && y < FIELD_HEIGHT && x >= 0 && x < FIELD_WIDTH) {
-                    state->game_field[y][x] = 1;
-                }
+    
+    switch (state->state) {
+        case FSM_Start:
+            state->state = FSM_Spawn;
+            break;
+            
+        case FSM_Spawn:
+            state->current_figure = state->next_figure;
+            state->current_figure.x = FIELD_WIDTH / 2 - 2;
+            state->current_figure.y = 0;
+            state->current_figure.rotation = 0;
+            
+            state->next_figure.type = get_random_figure();
+            state->next_figure.rotation = 0;
+            
+            if (check_collision()) {
+                state->state = FSM_GameOver;
+            } else {
+                state->state = FSM_Moving;
             }
-        }
-    }
-    
-    // Проверяем и удаляем заполненные строки
-    clear_completed_lines();
-    
-    // Сгенерировать новую текущую фигуру из следующей
-    state->current_figure = state->next_figure;
-    state->current_figure.x = FIELD_WIDTH / 2 - 2;
-    state->current_figure.y = 0;
-    state->current_figure.rotation = 0;
-    
-    // Сгенерировать новую следующую фигуру
-    state->next_figure.type = get_random_figure();
-    state->next_figure.rotation = 0;
-    
-    // Проверить, возможно ли размещение новой фигуры
-    if (check_collision()) {
-        state->game_over = true;
-    }
-}
-
-void update_game_state() {
-    GameStateData* state = get_instance();
-    
-    if (state->game_over) {
-        return;
-    }
-    
-    // Проверка времени для автоматического падения
-    long long current_time = time(NULL) * 1000; // в миллисекундах
-    if (current_time - state->drop_time >= state->speed) {
-        // Попробовать сдвинуть фигуру вниз
-        int old_y = state->current_figure.y;
-        state->current_figure.y++;
-        
-        if (check_collision()) {
-            // Если столкновение, вернуть позицию и зафиксировать фигуру
-            state->current_figure.y = old_y;
+            break;
+            
+        case FSM_Moving:
+            break;
+            
+        case FSM_Move:
+            state->current_figure.y++;
+            if (check_collision()) {
+                state->current_figure.y--;
+                state->state = FSM_Attaching;
+            } else {
+                state->state = FSM_Moving;
+            }
+            break;
+            
+        case FSM_Attaching:
             place_figure();
-        } else {
-            state->drop_time = current_time;
-        }
+            state->state = FSM_Spawn;
+            break;
+            
+        case FSM_GameOver:
+            break;
     }
 }
 

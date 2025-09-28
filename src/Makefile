@@ -24,23 +24,30 @@ CLIDIR = gui/cli
 
 # Файлы
 TETRIS_SRC = $(shell find $(TETRISDIR) -name "*.c")
+TETRIS_OBJ = $(TETRIS_SRC:.c=.o)
 CLI_SRC = $(shell find $(CLIDIR) -name "*.c")
-ALL_SRC = $(TETRIS_SRC) $(CLI_SRC)
-OBJ = $(ALL_SRC:.c=.o)
+CLI_OBJ = $(CLI_SRC:.c=.o)
 
-# Имя исполняемого файла
-TARGET = tetris_bin
+LIB_TETRIS = $(BUILDDIR)/libtetris.a
+TARGET = $(BUILDDIR)/tetris_bin.out
 
 # Установка
 PREFIX ?= /usr/local
 BINDIR = $(PREFIX)/bin
 
-all: $(TARGET)
+all: clean $(TARGET)
 
-$(TARGET): $(OBJ)
-	$(CC) $(OBJ) -o $@ $(LDFLAGS)
+$(LIB_TETRIS): $(TETRIS_OBJ)
+	mkdir -p $(BUILDDIR)
+	ar rcs $@ $^
 
-%.o: %.c
+$(TARGET): $(LIB_TETRIS) $(CLI_OBJ)
+	$(CC) $(CLI_OBJ) -L$(BUILDDIR) -ltetris -o $@ $(LDFLAGS)
+
+brick_game/tetris/%.o: brick_game/tetris/%.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+gui/cli/%.o: gui/cli/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 install: $(TARGET)
@@ -50,7 +57,7 @@ uninstall:
 	rm -f $(BINDIR)/$(TARGET)
 
 clean:
-	rm -f $(OBJ) $(TARGET) *.gcda *.gcno *.gcov
+	rm -f $(CLI_OBJ) $(TETRIS_OBJ) $(TARGET) *.gcda *.gcno *.gcov
 
 test:
 	@echo "Running tests..."

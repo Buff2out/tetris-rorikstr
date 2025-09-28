@@ -16,6 +16,16 @@ typedef enum {
     FIGURE_COUNT
 } FigureType;
 
+// FSM состояния
+typedef enum {
+    FSM_Start,
+    FSM_Spawn,
+    FSM_Moving,
+    FSM_Move,
+    FSM_Attaching,
+    FSM_GameOver
+} FSMState_t;
+
 // Структура фигуры
 typedef struct {
     int x, y;           // Позиция фигуры на поле
@@ -27,11 +37,10 @@ typedef struct {
     int game_field[FIELD_HEIGHT][FIELD_WIDTH];
     Figure current_figure;
     Figure next_figure;
-    bool figure_active;
+    FSMState_t state;
     int score;
     int high_score;
     int level;
-    int speed;
     long long drop_time;
     bool game_over;
     bool paused;
@@ -40,11 +49,12 @@ typedef struct {
 // Внутренние функции
 bool check_collision(void);
 void init_game(void);
-void update_game_state(void);
+void fsm_transition(void);
 int get_random_figure(void);
 const int (*get_figure_shape(FigureType type, int rotation))[4];
 GameStateData* get_game_state(void);
 void place_figure(void);
+void clear_completed_lines(void);
 
 // Фигуры
 const int (*i_fig_up())[4];

@@ -5,172 +5,162 @@
 #include <string.h>
 #include <time.h>
 
-static GameInfo_t game_info = {0};
-
-void init_game_info() {
-    if (game_info.field == NULL) {
-        game_info.field = malloc(FIELD_HEIGHT * sizeof(int*));
+static GameInfo_t* get_game_info_instance() {
+    static GameInfo_t instance = {0};
+    static bool initialized = false;
+    
+    if (!initialized) {
+        instance.field = malloc(FIELD_HEIGHT * sizeof(int*));
         for (int i = 0; i < FIELD_HEIGHT; i++) {
-            game_info.field[i] = malloc(FIELD_WIDTH * sizeof(int));
+            instance.field[i] = malloc(FIELD_WIDTH * sizeof(int));
         }
-    }
-    
-    if (game_info.next == NULL) {
-        game_info.next = malloc(4 * sizeof(int*));
+        
+        instance.next = malloc(4 * sizeof(int*));
         for (int i = 0; i < 4; i++) {
-            game_info.next[i] = malloc(4 * sizeof(int));
+            instance.next[i] = malloc(4 * sizeof(int));
         }
+        
+        // Инициализация полей
+        for (int i = 0; i < FIELD_HEIGHT; i++) {
+            for (int j = 0; j < FIELD_WIDTH; j++) {
+                instance.field[i][j] = 0;
+            }
+        }
+        
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                instance.next[i][j] = 0;
+            }
+        }
+        
+        initialized = true;
     }
     
-    // Инициализация полей
-    for (int i = 0; i < FIELD_HEIGHT; i++) {
-        for (int j = 0; j < FIELD_WIDTH; j++) {
-            game_info.field[i][j] = 0;
-        }
-    }
-    
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            game_info.next[i][j] = 0;
-        }
-    }
-}
-
-bool is_game_info_initialized() {
-    // Проверяем, инициализирован ли game_info
-    if (game_info.field == NULL) return false;
-    if (game_info.next == NULL) return false;
-    return true;
+    return &instance;
 }
 
 void userInput(UserAction_t action, bool hold) {
-    if (!is_game_info_initialized()) {
-        init_game_info();
-        init_game();
-    }
-    
     GameStateData* state = get_game_state();
+    GameInfo_t* game_info = get_game_info_instance();
 
-    if (action == Start) {
-        if (state->game_over) {
-            int saved_high_score = state->high_score; // Сохраняем high_score
-            init_game(); // Перезапуск игры
-            state->high_score = saved_high_score; // Восстанавливаем high_score
-        } else if (!state->paused) {
-            state->paused = true;
-        } else {
-            state->paused = false;
-        }
-        return;
-    }
-    
-    if (action == Pause) {
-        state->paused = !state->paused;
-        return;
-    }
-    
-    if (action == Terminate) {
-        // Освобождаем память при завершении
-        if (game_info.field != NULL) {
-            for (int i = 0; i < FIELD_HEIGHT; i++) {
-                free(game_info.field[i]);
+    switch (action) {
+        case Start:
+            if (state->state == FSM_GameOver) {
+                // Перезапуск игры
+                int saved_high_score = state->high_score;
+                init_game();
+                state->high_score = saved_high_score;
+                state->state = FSM_Spawn;
+            } else {
+                state->paused = !state->paused;
             }
-            free(game_info.field);
-            game_info.field = NULL;
-        }
-        
-        if (game_info.next != NULL) {
-            for (int i = 0; i < 4; i++) {
-                free(game_info.next[i]);
-            }
-            free(game_info.next);
-            game_info.next = NULL;
-        }
-        return;
-    }
-
-    if (state->game_over || state->paused) {
-        return;
-    }
-
-    if (state->figure_active && !state->game_over) {
-        int old_x = state->current_figure.x;
-        int old_y = state->current_figure.y;
-        int old_rot = state->current_figure.rotation;
-
-        switch (action) {
-            case Left:
-                state->current_figure.x--;
-                break;
-            case Right:
-                state->current_figure.x++;
-                break;
-            case Down:
-                state->current_figure.y++;
-                break;
-            case Up:
-                state->current_figure.rotation = (state->current_figure.rotation + 1) % 4;
-                break;
-            case Action:  // Это может быть вращение или сброс
-                if (hold) {
-                    // Быстрый сброс вниз
-                    while (!check_collision()) {
-                        state->current_figure.y++;
-                    }
-                    state->current_figure.y--; // Вернуть на место перед столкновением
-                    place_figure();
-                } else {
-                    state->current_figure.rotation = (state->current_figure.rotation + 1) % 4;
+            break;
+            
+        case Pause:
+            state->paused = !state->paused;
+            break;
+            
+        case Terminate:
+            // Освобождаем память при завершении
+            if (game_info->field != NULL) {
+                for (int i = 0; i < FIELD_HEIGHT; i++) {
+                    free(game_info->field[i]);
                 }
-                break;
-            default:
-                break;
-        }
+                free(game_info->field);
+                game_info->field = NULL;
+            }
+            
+            if (game_info->next != NULL) {
+                for (int i = 0; i < 4; i++) {
+                    free(game_info->next[i]);
+                }
+                free(game_info->next);
+                game_info->next = NULL;
+            }
+            break;
 
-        if (check_collision()) {
-            // Возвращаем старые значения
-            state->current_figure.x = old_x;
-            state->current_figure.y = old_y;
-            state->current_figure.rotation = old_rot;
-        } else if (action == Down) {
-            // Если перемещение вниз успешно, обновляем время падения
-            state->drop_time = time(NULL) * 1000;
-        }
+        default:
+            if (state->state == FSM_GameOver || state->paused) {
+                break;
+            }
+
+            if ((state->state == FSM_Moving || state->state == FSM_Move) && !state->game_over) {
+                int old_x = state->current_figure.x;
+                int old_y = state->current_figure.y;
+                int old_rot = state->current_figure.rotation;
+
+                switch (action) {
+                    case Left:
+                        state->current_figure.x--;
+                        break;
+                    case Right:
+                        state->current_figure.x++;
+                        break;
+                    case Down:
+                        state->current_figure.y++;
+                        break;
+                    case Up:
+                        state->current_figure.rotation = (state->current_figure.rotation + 1) % 4;
+                        break;
+                    case Action:
+                        if (hold) {
+                            // Быстрый сброс вниз
+                            while (!check_collision()) {
+                                state->current_figure.y++;
+                            }
+                            state->current_figure.y--; // Вернуть на место перед столкновением
+                            state->state = FSM_Attaching;
+                        } else {
+                            state->current_figure.rotation = (state->current_figure.rotation + 1) % 4;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+
+                if (check_collision()) {
+                    // Возвращаем старые значения
+                    state->current_figure.x = old_x;
+                    state->current_figure.y = old_y;
+                    state->current_figure.rotation = old_rot;
+                } else if (action == Down) {
+                    // Если перемещение вниз успешно, обновляем время падения
+                    state->drop_time = time(NULL) * 1000;
+                }
+            }
+            break;
     }
 }
 
 GameInfo_t updateCurrentState() {
-    if (!is_game_info_initialized()) {
-        init_game_info();
-        init_game();
-    }
-    
     GameStateData* state = get_game_state();
+    GameInfo_t* game_info = get_game_info_instance();
     
     if (!state->game_over && !state->paused) {
         long long current_time = time(NULL) * 1000;
-        if (current_time - state->drop_time >= state->speed) {
-            int old_y = state->current_figure.y;
-            state->current_figure.y++;
-            
-            if (check_collision()) {
-                state->current_figure.y = old_y;
-                place_figure();
-            } else {
-                state->drop_time = current_time;
-            }
+        
+        // Определяем интервал падения в зависимости от уровня
+        int drop_interval = 1000 - (state->level - 1) * 50;
+        if (drop_interval < 100) drop_interval = 100; // Минимальный интервал
+        
+        if (current_time - state->drop_time >= drop_interval) {
+            state->state = FSM_Move; // Переходим к автоматическому движению
+            state->drop_time = current_time;
         }
     }
+    
+    // Выполняем переходы FSM
+    fsm_transition();
     
     // Обновляем game_info.field из state->game_field
     for (int i = 0; i < FIELD_HEIGHT; i++) {
         for (int j = 0; j < FIELD_WIDTH; j++) {
-            game_info.field[i][j] = state->game_field[i][j];
+            game_info->field[i][j] = state->game_field[i][j];
         }
     }
     
     // Добавляем активную фигуру на поле для отображения (если не game_over)
-    if (state->figure_active && !state->game_over) {
+    if ((state->state == FSM_Moving || state->state == FSM_Move) && !state->game_over) {
         Figure* f = &state->current_figure;
         const int (*shape)[4] = get_figure_shape(f->type, f->rotation);
         for (int i = 0; i < 4; i++) {
@@ -179,7 +169,7 @@ GameInfo_t updateCurrentState() {
                     int x = f->x + j;
                     int y = f->y + i;
                     if (x >= 0 && x < FIELD_WIDTH && y >= 0 && y < FIELD_HEIGHT) {
-                        game_info.field[y][x] = 1;
+                        game_info->field[y][x] = 1;
                     }
                 }
             }
@@ -188,7 +178,7 @@ GameInfo_t updateCurrentState() {
     
     // Обновляем next
     const int (*next_shape)[4];
-    if (state->game_over) {
+    if (state->state == FSM_GameOver) {
         // При game_over показываем пустую фигуру
         next_shape = empty_fig();
     } else {
@@ -197,16 +187,16 @@ GameInfo_t updateCurrentState() {
     
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            game_info.next[i][j] = next_shape[i][j];
+            game_info->next[i][j] = next_shape[i][j];
         }
     }
     
     // Обновляем остальные поля
-    game_info.score = state->score;
-    game_info.high_score = state->high_score;
-    game_info.level = state->level;
-    game_info.speed = state->speed;
-    game_info.pause = state->paused ? 1 : 0;
+    game_info->score = state->score;
+    game_info->high_score = state->high_score;
+    game_info->level = state->level;
+    game_info->speed = 0; // Заглушка
+    game_info->pause = state->paused ? 1 : 0;
     
-    return game_info;
+    return *game_info;
 }

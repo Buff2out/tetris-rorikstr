@@ -10,8 +10,10 @@ void display_game() {
     // Отображение игрового поля
     for (int i = 0; i < FIELD_HEIGHT; i++) {
         for (int j = 0; j < FIELD_WIDTH; j++) {
-            if (game_state.field[i][j] != 0) {
-                mvaddch(i + 1, j * 2 + 1, '#');  // Заполненные блоки
+            if (game_state.field[i][j] == 2) {
+                mvaddch(i + 1, j * 2 + 1, '#');  // Закрепленные блоки
+            } else if (game_state.field[i][j] == 1) {
+                mvaddch(i + 1, j * 2 + 1, '$');  // Активная фигура
             } else {
                 mvaddch(i + 1, j * 2 + 1, '.');  // Пустые ячейки
             }

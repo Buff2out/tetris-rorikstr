@@ -1,4 +1,3 @@
-// src/brick_game/tetris/tetris.c
 #include "tetris.h"
 #include "game_logic.h"
 #include <stdio.h>
@@ -7,7 +6,6 @@
 #include <time.h>
 
 static GameInfo_t game_info = {0};
-static bool initialized = false;  // Добавляем эту переменную
 
 void init_game_info() {
     if (game_info.field == NULL) {
@@ -38,18 +36,26 @@ void init_game_info() {
     }
 }
 
+bool is_game_info_initialized() {
+    // Проверяем, инициализирован ли game_info
+    if (game_info.field == NULL) return false;
+    if (game_info.next == NULL) return false;
+    return true;
+}
+
 void userInput(UserAction_t action, bool hold) {
-    if (!initialized) {
+    if (!is_game_info_initialized()) {
         init_game_info();
         init_game();
-        initialized = true;
     }
     
     GameStateData* state = get_game_state();
 
     if (action == Start) {
         if (state->game_over) {
+            int saved_high_score = state->high_score; // Сохраняем high_score
             init_game(); // Перезапуск игры
+            state->high_score = saved_high_score; // Восстанавливаем high_score
         } else if (!state->paused) {
             state->paused = true;
         } else {
@@ -64,6 +70,22 @@ void userInput(UserAction_t action, bool hold) {
     }
     
     if (action == Terminate) {
+        // Освобождаем память при завершении
+        if (game_info.field != NULL) {
+            for (int i = 0; i < FIELD_HEIGHT; i++) {
+                free(game_info.field[i]);
+            }
+            free(game_info.field);
+            game_info.field = NULL;
+        }
+        
+        if (game_info.next != NULL) {
+            for (int i = 0; i < 4; i++) {
+                free(game_info.next[i]);
+            }
+            free(game_info.next);
+            game_info.next = NULL;
+        }
         return;
     }
 
@@ -118,10 +140,9 @@ void userInput(UserAction_t action, bool hold) {
 }
 
 GameInfo_t updateCurrentState() {
-    if (!initialized) {
+    if (!is_game_info_initialized()) {
         init_game_info();
         init_game();
-        initialized = true;
     }
     
     GameStateData* state = get_game_state();

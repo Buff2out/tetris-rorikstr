@@ -68,6 +68,8 @@ int main() {
         display_game();
     }
 
+    // Вызов userInput с Terminate для освобождения памяти
+    userInput(Terminate, false);
     endwin();
     return 0;
 }

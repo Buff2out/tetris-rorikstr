@@ -75,7 +75,7 @@ void userInput(UserAction_t action, bool hold) {
                 int saved_high_score = state->high_score;
                 init_game();
                 state->high_score = saved_high_score;
-                // Не меняем состояние, пусть остается в Start до следующего нажатия
+                // Не меняем состояние, пусть остается в FSM_Start до следующего нажатия
             } else if (state->state == FSM_Start) {
                 // Начинаем игру из состояния Start
                 state->state = FSM_Spawn;
@@ -84,7 +84,7 @@ void userInput(UserAction_t action, bool hold) {
                 state->paused = !state->paused;
             }
             break;
-                    
+            
         case Pause:
             state->paused = !state->paused;
             break;
@@ -194,8 +194,8 @@ GameInfo_t updateCurrentState() {
     
     // Обновляем next
     const int (*next_shape)[4];
-    if (state->state == FSM_GameOver || state->state == FSM_Start) {
-        // При game_over или в начальном состоянии показываем пустую фигуру
+    if (state->state == FSM_GameOver) {
+        // При game_over показываем пустую фигуру
         next_shape = empty_fig();
     } else {
         next_shape = get_figure_shape(state->next_figure.type, state->next_figure.rotation);

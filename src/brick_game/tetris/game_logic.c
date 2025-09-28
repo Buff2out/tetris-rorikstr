@@ -46,11 +46,12 @@ void init_game() {
     state->next_figure.rotation = 0;
     
     state->score = 0;
+    state->high_score = 0;
     state->level = 1;
     state->drop_time = time(NULL) * 1000;
     state->game_over = false;
     state->paused = false;
-    state->state = FSM_Start;  // Начинаем в состоянии Start
+    state->state = FSM_Start;  // Начинаем в состоянии FSM_Start
 }
 
 void place_figure() {
@@ -92,7 +93,7 @@ void place_figure() {
 }
 
 void clear_completed_lines() {
-    GameStateData* state = get_game_state();
+    GameStateData* state = get_instance();
     int lines_cleared = 0;
     int write_row = FIELD_HEIGHT - 1;
     
@@ -177,7 +178,7 @@ bool check_collision() {
 }
 
 void fsm_transition() {
-    GameStateData* state = get_game_state();
+    GameStateData* state = get_instance();
     
     switch (state->state) {
         case FSM_Start:
@@ -215,8 +216,6 @@ void fsm_transition() {
             
         case FSM_Attaching:
             place_figure();
-            // После place_figure проверяем, не произошел ли Game Over
-            // В place_figure уже устанавливается FSM_Spawn, но нужно проверить столкновение
             break;
             
         case FSM_GameOver:

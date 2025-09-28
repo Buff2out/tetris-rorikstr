@@ -5,30 +5,39 @@
 void display_game() {
     clear();
 
-    GameStateData* state = get_game_state();
+    GameInfo_t game_state = updateCurrentState();
 
-    // Очистка поля
+    // Отображение игрового поля
     for (int i = 0; i < FIELD_HEIGHT; i++) {
         for (int j = 0; j < FIELD_WIDTH; j++) {
-            mvaddch(i + 1, j * 2 + 1, '.');
+            if (game_state.field[i][j] != 0) {
+                mvaddch(i + 1, j * 2 + 1, '#');  // Заполненные блоки
+            } else {
+                mvaddch(i + 1, j * 2 + 1, '.');  // Пустые ячейки
+            }
         }
     }
 
-    // Если фигура активна — отображаем её
-    if (state->figure_active) {
-        Figure* f = &state->current_figure;
-        const int (*shape)[4] = get_figure_shape(f->type, f->rotation);
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                if (shape[i][j]) {
-                    int x = f->x + j;
-                    int y = f->y + i;
-                    if (x >= 0 && x < FIELD_WIDTH && y >= 0 && y < FIELD_HEIGHT) {
-                        mvaddch(y + 1, x * 2 + 1, '$');
-                    }
-                }
+    // Отображение следующей фигуры
+    mvaddstr(1, FIELD_WIDTH * 2 + 5, "Next figure:");
+    
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            if (game_state.next[i][j]) {
+                mvaddch(i + 3, (FIELD_WIDTH * 2 + 5) + j * 2, '@');
+            } else {
+                mvaddch(i + 3, (FIELD_WIDTH * 2 + 5) + j * 2, ' ');
             }
         }
+    }
+
+    mvprintw(FIELD_HEIGHT + 2, 1, "Score: %d", game_state.score);
+    mvprintw(FIELD_HEIGHT + 3, 1, "High Score: %d", game_state.high_score);
+    mvprintw(FIELD_HEIGHT + 4, 1, "Level: %d", game_state.level);
+    mvprintw(FIELD_HEIGHT + 5, 1, "Speed: %d", game_state.speed);
+    
+    if (game_state.pause) {
+        mvprintw(FIELD_HEIGHT / 2, FIELD_WIDTH - 4, "PAUSED");
     }
 
     refresh();

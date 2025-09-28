@@ -14,35 +14,57 @@ int main() {
     nodelay(stdscr, TRUE);
     curs_set(0);
 
-    timeout(100);  // Таймаут для getch()
+    timeout(100);
 
     int ch;
-    UserAction_t action = Undefined;
-    while (Terminate != action) {
+    UserAction_t current_action;
+    bool action_valid = false;
+    bool running = true;
+    
+    while (running) {
         ch = getch();
+        action_valid = false;
 
         switch (ch) {
-            case 'q': action = Terminate; break;
-            case '1': action = Figure1; break;
-            case '2': action = Figure2; break;
-            case '3': action = Figure3; break;
-            case '4': action = Figure4; break;
-            case '5': action = Figure5; break;
-            case '6': action = Figure6; break;
-            case '7': action = Figure7; break;
-            case 'r': action = Rotate; break;
-            case ' ': action = Rotate; break;
-            case KEY_LEFT: action = Left; break;
-            case KEY_RIGHT: action = Right; break;
-            case KEY_DOWN: action = Down; break;
-            case KEY_UP: action = Up; break;
-            default: action = Undefined;
+            case 'q': 
+                userInput(Terminate, false);
+                running = false;
+                break;
+            case 'r': case ' ': 
+                current_action = Action; 
+                action_valid = true; 
+                break;
+            case KEY_LEFT: 
+                current_action = Left; 
+                action_valid = true; 
+                break;
+            case KEY_RIGHT: 
+                current_action = Right; 
+                action_valid = true; 
+                break;
+            case KEY_DOWN: 
+                current_action = Down; 
+                action_valid = true; 
+                break;
+            case KEY_UP: 
+                current_action = Up; 
+                action_valid = true; 
+                break;
+            case 's': case 'S': 
+                current_action = Start; 
+                action_valid = true; 
+                break;
+            case 'p': case 'P': 
+                current_action = Pause; 
+                action_valid = true; 
+                break;
+        }
+        
+        if (action_valid) {
+            userInput(current_action, false);
         }
 
-        if (action != Undefined) {
-            user_input(action);
-        }
-
+        updateCurrentState();
         display_game();
     }
 

@@ -64,12 +64,12 @@ int main() {
             userInput(current_action, false);
         }
 
-        updateCurrentState();
-        display_game();
+        if (running) {  // Обновляем состояние только если не завершаемся
+            updateCurrentState();
+            display_game();
+        }
     }
 
-    // Вызов userInput с Terminate для освобождения памяти
-    userInput(Terminate, false);
     endwin();
     return 0;
 }

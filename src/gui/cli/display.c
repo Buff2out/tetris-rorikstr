@@ -3,9 +3,13 @@
 #include "../../brick_game/tetris/tetris.h"
 
 void display_game() {
+    printf("DEBUG: display_game called\n");
     clear();
 
     GameInfo_t game_state = updateCurrentState();
+    
+    printf("DEBUG: Got game state, field: %p, next: %p\n", 
+           game_state.field, game_state.next);
 
     // Отображение игрового поля
     for (int i = 0; i < FIELD_HEIGHT; i++) {
@@ -43,4 +47,5 @@ void display_game() {
     }
 
     refresh();
+    printf("DEBUG: display_game completed\n");
 }

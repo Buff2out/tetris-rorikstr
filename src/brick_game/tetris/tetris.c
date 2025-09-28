@@ -44,27 +44,14 @@ void userInput(UserAction_t action, bool hold) {
     GameInfo_t* game_info = get_game_info_instance();
 
     switch (action) {
-        case Start:
-            if (state->state == FSM_GameOver) {
-                // Перезапуск игры
-                int saved_high_score = state->high_score;
-                init_game();
-                state->high_score = saved_high_score;
-                state->state = FSM_Spawn;
-            } else {
-                state->paused = !state->paused;
-            }
-            break;
-            
-        case Pause:
-            state->paused = !state->paused;
-            break;
-            
         case Terminate:
             // Освобождаем память при завершении
             if (game_info->field != NULL) {
                 for (int i = 0; i < FIELD_HEIGHT; i++) {
-                    free(game_info->field[i]);
+                    if (game_info->field[i] != NULL) {
+                        free(game_info->field[i]);
+                        game_info->field[i] = NULL;
+                    }
                 }
                 free(game_info->field);
                 game_info->field = NULL;
@@ -72,15 +59,38 @@ void userInput(UserAction_t action, bool hold) {
             
             if (game_info->next != NULL) {
                 for (int i = 0; i < 4; i++) {
-                    free(game_info->next[i]);
+                    if (game_info->next[i] != NULL) {
+                        free(game_info->next[i]);
+                        game_info->next[i] = NULL;
+                    }
                 }
                 free(game_info->next);
                 game_info->next = NULL;
             }
+            return; // ВАЖНО: выходим из функции, не делаем ничего после Terminate
+
+        case Start:
+            if (state->state == FSM_GameOver) {
+                // Перезапуск игры после Game Over
+                int saved_high_score = state->high_score;
+                init_game();
+                state->high_score = saved_high_score;
+                // Не меняем состояние, пусть остается в Start до следующего нажатия
+            } else if (state->state == FSM_Start) {
+                // Начинаем игру из состояния Start
+                state->state = FSM_Spawn;
+            } else {
+                // Для всех других состояний (Moving, Move) - ставим на паузу
+                state->paused = !state->paused;
+            }
+            break;
+                    
+        case Pause:
+            state->paused = !state->paused;
             break;
 
         default:
-            if (state->state == FSM_GameOver || state->paused) {
+            if (state->state == FSM_GameOver || state->paused || state->state == FSM_Start) {
                 break;
             }
 
@@ -136,7 +146,7 @@ GameInfo_t updateCurrentState() {
     GameStateData* state = get_game_state();
     GameInfo_t* game_info = get_game_info_instance();
     
-    if (!state->game_over && !state->paused) {
+    if (state->state != FSM_Start && !state->game_over && !state->paused) {
         long long current_time = time(NULL) * 1000;
         
         // Определяем интервал падения в зависимости от уровня
@@ -149,8 +159,10 @@ GameInfo_t updateCurrentState() {
         }
     }
     
-    // Выполняем переходы FSM
-    fsm_transition();
+    // Выполняем переходы FSM (но не в состоянии Start)
+    if (state->state != FSM_Start) {
+        fsm_transition();
+    }
     
     // Обновляем game_info.field из state->game_field
     for (int i = 0; i < FIELD_HEIGHT; i++) {
@@ -159,7 +171,7 @@ GameInfo_t updateCurrentState() {
         }
     }
     
-    // Добавляем активную фигуру на поле для отображения (если не game_over)
+    // Добавляем активную фигуру на поле для отображения (если не в Start или GameOver)
     if ((state->state == FSM_Moving || state->state == FSM_Move) && !state->game_over) {
         Figure* f = &state->current_figure;
         const int (*shape)[4] = get_figure_shape(f->type, f->rotation);
@@ -168,8 +180,12 @@ GameInfo_t updateCurrentState() {
                 if (shape[i][j]) {
                     int x = f->x + j;
                     int y = f->y + i;
+                    // Проверяем границы перед записью
                     if (x >= 0 && x < FIELD_WIDTH && y >= 0 && y < FIELD_HEIGHT) {
-                        game_info->field[y][x] = 1;
+                        // Не перезаписываем уже зафиксированные блоки
+                        if (state->game_field[y][x] == 0) {
+                            game_info->field[y][x] = 1;
+                        }
                     }
                 }
             }
@@ -178,8 +194,8 @@ GameInfo_t updateCurrentState() {
     
     // Обновляем next
     const int (*next_shape)[4];
-    if (state->state == FSM_GameOver) {
-        // При game_over показываем пустую фигуру
+    if (state->state == FSM_GameOver || state->state == FSM_Start) {
+        // При game_over или в начальном состоянии показываем пустую фигуру
         next_shape = empty_fig();
     } else {
         next_shape = get_figure_shape(state->next_figure.type, state->next_figure.rotation);

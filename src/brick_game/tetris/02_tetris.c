@@ -1,27 +1,7 @@
 #include "01_automato.h"
 #include "../../logging.h"
 
-int load_high_score() {
-    FILE* file = fopen("high_score.txt", "r");
-    int high_score = 0;
-    if (file) {
-        fscanf(file, "%d", &high_score);
-        fclose(file);
-    }
-    return high_score;
-}
-
-void save_high_score(int score) {
-    FILE* file = fopen("high_score.txt", "w");
-    if (file) {
-        fprintf(file, "%d", score);
-        fclose(file);
-    }
-}
-
 void userInput(UserAction_t action, bool hold) {
-    LOG_FUNCTION_START("userInput", "action=%d, hold=%d", action, hold);
-    
     (void)hold;  // заглушка
     GameState_t* state = get_game_state();
 
@@ -29,7 +9,6 @@ void userInput(UserAction_t action, bool hold) {
     if (state->info->pause && 
         (action == Left || action == Right || action == Down || action == Up || 
          action == Action || action == Start)) {
-        LOG_FUNCTION_END("userInput", "ignored movement command during pause, state=%d", state->state);
         return;
     }
 
@@ -68,9 +47,7 @@ void userInput(UserAction_t action, bool hold) {
             break;
         default:
             break;
-    }
-    
-    LOG_FUNCTION_END("userInput", "state=%d", state->state);
+    }   
 }
 
 GameInfo_t updateCurrentState() {

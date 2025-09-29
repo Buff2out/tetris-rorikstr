@@ -5,8 +5,6 @@
 
 // display.c
 void display_game(GameInfo_t game_state) {
-    LOG_FUNCTION_START("display_game", "");
-    
     clear();
 
     // Отображение игрового поля (всегда, даже во время паузы)

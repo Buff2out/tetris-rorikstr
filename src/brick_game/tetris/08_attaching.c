@@ -2,8 +2,6 @@
 #include "../../logging.h"
 
 void do_attaching(void) {
-    LOG_FUNCTION_START("do_attaching", "");
-    
     GameState_t* state = get_game_state();
     // Закрепляем фигуру на поле
     place_figure();
@@ -12,7 +10,6 @@ void do_attaching(void) {
     clear_lines();
 
     // Проверяем GameOver
-    int is_gameov = 0;
     if (is_game_over()) {
         state->state = GameOver;
     } else {
@@ -23,8 +20,6 @@ void do_attaching(void) {
 }
 
 int check_collision() {
-    LOG_FUNCTION_START("check_collision", "");
-    
     GameState_t* state = get_game_state();
     Figure_t* fig = &state->curr;
 
@@ -35,11 +30,9 @@ int check_collision() {
                 int y = fig->y + i;
 
                 if (x < 0 || x >= FIELD_WIDTH || y >= FIELD_HEIGHT) {
-                    LOG_FUNCTION_END("check_collision", "collision with boundary, x=%d, y=%d", x, y);
                     return 1;  // коллизия
                 }
                 if (y >= 0 && state->field[y][x]) {
-                    LOG_FUNCTION_END("check_collision", "collision with field, x=%d, y=%d", x, y);
                     return 1;  // коллизия с другой фигурой
                 }
             }
@@ -53,7 +46,6 @@ int check_collision() {
 void place_figure() {
     
     GameState_t* state = get_game_state();
-    LOG_FUNCTION_START("place_figure", "curr=(%d,%d)", state->curr.x, state->curr.y);
     Figure_t* fig = &state->curr;
 
     for (int i = 0; i < 4; ++i) {
@@ -67,14 +59,14 @@ void place_figure() {
             }
         }
     }
-    
-    LOG_FUNCTION_END("place_figure", "");
 }
 
 void clear_lines() {
     
     GameState_t* state = get_game_state();
-    LOG_FUNCTION_START("clear_lines", "score=%d", state->info->score);
+    int old_level = state->info->level;
+    int old_speed = state->info->speed;
+    
     int lines_cleared = 0;
 
     for (int i = FIELD_HEIGHT - 1; i >= 0; --i) {
@@ -104,13 +96,33 @@ void clear_lines() {
     // Начисление очков
     if (lines_cleared > 0) {
         int points[] = {0, 100, 300, 700, 1500};
+        int old_score = state->info->score;
         state->info->score += points[lines_cleared];
-        if (state->info->score / 600 > state->info->level - 1) {
-            state->info->level++;
-            state->info->speed = state->info->level;
+        
+        // Обновляем рекорд, если нужно
+        if (state->info->score > state->info->high_score) {
+            state->info->high_score = state->info->score;
+        }
+        
+        // Увеличиваем уровень каждые 600 очков (максимум 10 уровней)
+        int new_level = (state->info->score / 600) + 1;
+        if (new_level > 10) new_level = 10;
+        
+        if (new_level > state->info->level) {
+            state->info->level = new_level;
+            
+            // СУПЕР-УСКОРЕНИЕ! В 50 раз быстрее!
+            state->info->speed = new_level * 50;
+            
+            LOG_FUNCTION_END("clear_lines", "lines_cleared=%d, score=%d->%d, level=%d->%d, speed=%d->%d", 
+                             lines_cleared, old_score, state->info->score, old_level, state->info->level, 
+                             old_speed, state->info->speed);
+            return;
         }
     }
     
-    LOG_FUNCTION_END("clear_lines", "lines_cleared=%d, score=%d, level=%d", 
-                     lines_cleared, state->info->score, state->info->level);
+    // Добавим лог, даже если линии не очищались
+    LOG_FUNCTION_END("clear_lines", "lines_cleared=%d, score=%d->%d, level=%d->%d, speed=%d->%d", 
+                     lines_cleared, state->info->score, state->info->score, old_level, state->info->level, 
+                     old_speed, state->info->speed);
 }

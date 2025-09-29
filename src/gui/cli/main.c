@@ -32,7 +32,7 @@ int main() {
     }
 
     nodelay(stdscr, TRUE);
-    timeout(100);
+    timeout(10);
 
     UserAction_t current_action = {0};
     bool action_valid = false;

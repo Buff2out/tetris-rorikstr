@@ -2,9 +2,27 @@
 #include <stdlib.h>
 #include "../../logging.h"
 
+int load_high_score() {
+    FILE* file = fopen("high_score.txt", "r");
+    int high_score = 0;
+    if (file) {
+        if (fscanf(file, "%d", &high_score) != 1) {
+            high_score = 0;  // Если не удалось прочитать, устанавливаем 0
+        }
+        fclose(file);
+    }
+    return high_score;
+}
+
+void save_high_score(int score) {
+    FILE* file = fopen("high_score.txt", "w");
+    if (file) {
+        fprintf(file, "%d", score);
+        fclose(file);
+    }
+}
+
 GameState_t* get_game_state(void) {
-    LOG_FUNCTION_START("get_game_state", "");
-    
     static GameState_t state = {0};
     static int initialized = 0;
 
@@ -25,10 +43,11 @@ GameState_t* get_game_state(void) {
         }
 
         // Инициализируем начальные значения
-        state.info->speed = 1;
+        state.info->speed = 100;
         state.info->score = 0;
         state.info->level = 1;
         state.info->pause = 0;
+        state.info->high_score = load_high_score();  // Загружаем рекорд
         
         // Инициализируем следующую фигуру
         state.next.sprite = rand() % FIGURE_COUNT;
@@ -42,7 +61,6 @@ GameState_t* get_game_state(void) {
         initialized = 1;
     }
     
-    LOG_FUNCTION_END("get_game_state", "state=%d", state.state);
     return &state;
 }
 

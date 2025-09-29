@@ -2,9 +2,14 @@
 #include "../../logging.h"
 
 void do_gameover(void) {
-    LOG_FUNCTION_START("do_gameover", "");
-    
     GameState_t* state = get_game_state();
+    
+    // Сохраняем рекорд, если текущий рекорд побит
+    if (state->info->score > state->info->high_score) {
+        state->info->high_score = state->info->score;
+        save_high_score(state->info->high_score);
+    }
+    
     // Сброс next в пустую фигуру
     const int (*shape)[4] = empty_fig();
     for (int i = 0; i < 4; ++i)
@@ -15,8 +20,6 @@ void do_gameover(void) {
 }
 
 int is_game_over() {
-    LOG_FUNCTION_START("is_game_over", "");
-    
     GameState_t* state = get_game_state();
     // Проверяем, есть ли блоки в верхних рядах
     for (int j = 0; j < FIELD_WIDTH; ++j) {
@@ -26,6 +29,5 @@ int is_game_over() {
         }
     }
     
-    LOG_FUNCTION_END("is_game_over", "game not over");
     return 0;
 }

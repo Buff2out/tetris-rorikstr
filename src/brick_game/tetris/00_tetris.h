@@ -2,6 +2,7 @@
 #define TETRIS_H
 
 #include <stdbool.h>
+#include <stdio.h>
 
 #define FIELD_WIDTH 10
 #define FIELD_HEIGHT 20

@@ -54,6 +54,8 @@ GameState_t* get_game_state(void);
 // Функции состояний
 // init
 void do_init(void);
+int load_high_score();
+void save_high_score(int score);
 
 // spawn
 void do_spawn(void);

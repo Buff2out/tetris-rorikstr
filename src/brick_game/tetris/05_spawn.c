@@ -3,8 +3,6 @@
 #include "../../logging.h"
 
 void do_spawn(void) {
-    LOG_FUNCTION_START("do_spawn", "");
-    
     GameState_t* state = get_game_state();
     
     // Устанавливаем текущую фигуру из следующей (или генерируем первую)
@@ -23,12 +21,8 @@ void do_spawn(void) {
     // Проверка на GameOver
     if (check_collision()) {
         state->state = GameOver;
-        LOG_FUNCTION_END("do_spawn", "collision detected, state=%d", state->state);
         return;
     }
 
     state->state = Move;
-    
-    LOG_FUNCTION_END("do_spawn", "curr=(%d,%d), next_sprite=%d, state=%d", 
-                     state->curr.x, state->curr.y, state->next.sprite, state->state);
 }

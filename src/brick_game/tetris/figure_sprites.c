@@ -1,4 +1,4 @@
-#include "game_logic.h"
+#include "01_automato.h"
 #include <string.h>
 
 const int (*get_figure_shape(FigureType type, int rotation))[4] {

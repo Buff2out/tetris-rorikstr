@@ -1,10 +1,18 @@
-#ifndef GAME_LOGIC_H
-#define GAME_LOGIC_H
+#ifndef AUTOMATO_H
+#define AUTOMATO_H
 
+#include "00_tetris.h"
 #include <stdbool.h>
-#include "tetris.h"  // для использования GameInfo_t
 
-// Типы фигур
+typedef enum {
+    Init,
+    Spawn,
+    Moving,
+    Move,
+    Attaching,
+    GameOver
+} Automato_t;
+
 typedef enum {
     I = 0,
     J,
@@ -16,47 +24,45 @@ typedef enum {
     FIGURE_COUNT
 } FigureType;
 
-// FSM состояния
-typedef enum {
-    FSM_Start,
-    FSM_Spawn,
-    FSM_Moving,
-    FSM_Move,
-    FSM_Attaching,
-    FSM_GameOver
-} FSMState_t;
-
-// Структура фигуры
 typedef struct {
     int x, y;           // Позиция фигуры на поле
+    int mtrx[4][4];     // сама матрица
     FigureType type;    // Тип фигуры
     int rotation;       // Поворот (0–3)
 } Figure;
 
 typedef struct {
-    int game_field[FIELD_HEIGHT][FIELD_WIDTH];
-    Figure current_figure;
-    Figure next_figure;
-    FSMState_t state;
+    Figure curr;
+    Figure next;
+    Automato_t state;
+    int field[FIELD_HEIGHT][FIELD_WIDTH];
     int score;
     int high_score;
     int level;
-    long long drop_time;
-    bool game_over;
-    bool paused;
-} GameStateData;
+    int speed;
+    long long last_time;
+} GameState_t;
 
-// Внутренние функции
-bool check_collision(void);
-void init_game(void);
-void fsm_transition(void);
-int get_random_figure(void);
+GameState_t* get_game_state(void);
+
+// Функции состояний
+void do_start(void);
+void do_spawn(void);
+void do_move(void);
+void do_moving(void);
+void do_attaching(void);
+void do_gameover(void);
+
+// Вспомогательные
+void place_figure_on_field();
+int check_collision();
+void clear_lines();
+int is_game_over();
+
+// Функции фигур
 const int (*get_figure_shape(FigureType type, int rotation))[4];
-GameStateData* get_game_state(void);
-void place_figure(void);
-void clear_completed_lines(void);
 
-// Фигуры
+// Остальные фигуры...
 const int (*i_fig_up())[4];
 const int (*i_fig_right())[4];
 const int (*i_fig_down())[4];
@@ -83,5 +89,6 @@ const int (*z_fig_right())[4];
 const int (*z_fig_down())[4];
 const int (*z_fig_left())[4];
 const int (*empty_fig())[4];
+
 
 #endif

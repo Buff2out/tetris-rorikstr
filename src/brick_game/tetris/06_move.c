@@ -21,7 +21,7 @@ void do_move(void) {
     int delay = (state->moving_type == ToDown) ? 50 : (1000 / state->info->speed);
 
     if (current_time - state->last_time < delay) {
-        LOG_FUNCTION_END("do_move", "not enough time passed, delay=%d ms", delay);
+        LOG_FUNCTION_END("do_move", "not enough time passed, delay=%ld ms, current_time=%ld, state->last_time=%ld, difference=%ld", delay, current_time, state->last_time, current_time - state->last_time);
         return;  // ещё не время
     }
     state->last_time = current_time;

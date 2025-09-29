@@ -3,13 +3,23 @@
 #include "../../brick_game/tetris/00_tetris.h"
 
 void display_game() {
-    printf("DEBUG: display_game called\n");
     clear();
 
     GameInfo_t game_state = updateCurrentState();
     
-    printf("DEBUG: Got game state, field: %p, next: %p\n", 
-           game_state.field, game_state.next);
+    // Проверяем, является ли состояние GameOver
+    if (game_state.next[0][0] == 0 && game_state.next[0][1] == 0 && game_state.next[0][2] == 0 && game_state.next[0][3] == 0) {
+        mvprintw(FIELD_HEIGHT / 2, FIELD_WIDTH - 4, "GAME OVER");
+        refresh();
+        return;
+    }
+
+    // Проверяем pause
+    if (game_state.pause) {
+        mvprintw(FIELD_HEIGHT / 2, FIELD_WIDTH - 4, "PAUSED");
+        refresh();
+        return;
+    }
 
     // Отображение игрового поля
     for (int i = 0; i < FIELD_HEIGHT; ++i) {

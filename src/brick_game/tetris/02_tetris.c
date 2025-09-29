@@ -1,43 +1,47 @@
 #include "01_automato.h"
-#include <stdlib.h>
 
 void userInput(UserAction_t action, bool hold) {
-    GameState_t* g_state = get_game_state();
-    GameInfo_t* g_info = get_info_state();
+    (void)hold;  // заглушка
+    GameState_t* state = get_game_state();
 
     switch (action) {
         case Start:
-            g_state->state = Init;
+            state->state = Init;
             break;
         case Terminate:
-            if (g_info->score > g_info->high_score) {
-                g_info->high_score = g_info->score;
+            if (state->info.score > state->info.high_score) {
+                state->info.high_score = state->info.score;
             }
+            state->state = GameOver;
             break;
         case Left:
-            g_state->state = Moving;
-            g_state->moving_type = LeftDown;
+            state->state = Moving;
+            state->moving_type = LeftDown;
             break;
         case Right:
-            g_state->state = Moving;
-            g_state->moving_type = RightDown;
+            state->state = Moving;
+            state->moving_type = RightDown;
             break;
         case Action:
-            g_state->state = Moving;
-            g_state->moving_type = Rotate;
+            state->state = Moving;
+            state->moving_type = Rotate;
             break;
         case Down:
-            // Ускорение падения — будет обрабатываться в do_move
+            state->state = Moving;
+            state->moving_type = ToDown;
+            break;
+        case Pause:
+            state->info.pause = !state->info.pause;
             break;
         default:
-            break; // pause и down - не нужны в backend логике.
+            break;
     }
 }
 
 GameInfo_t updateCurrentState() {
-    GameState_t* g_state = get_game_state();
-    switch (g_state->state) {
-        case Start:
+    GameState_t* state = get_game_state();
+    switch (state->state) {
+        case Init:
             do_init();
             break;
         case Spawn:
@@ -57,9 +61,9 @@ GameInfo_t updateCurrentState() {
             break;
     }
 
-    GameInfo_t info = {0};
-    info.field = (int**)g_state->field;
-    info.next = (int**)g_state->next.mtrx;  // теперь next.mtrx
+    GameInfo_t info = state->info;
+    info.field = (int**)state->field;
+    info.next = (int**)state->next.mtrx;
     info.pause = 0;
     return info;
 }

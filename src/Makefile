@@ -43,6 +43,7 @@ $(LIB_TETRIS): $(TETRIS_OBJ)
 
 $(TARGET): $(LIB_TETRIS) $(CLI_OBJ)
 	$(CC) $(CLI_OBJ) -L$(BUILDDIR) -ltetris -o $@ $(LDFLAGS)
+	rm -f $(CLI_OBJ) $(TETRIS_OBJ)
 
 brick_game/tetris/%.o: brick_game/tetris/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -57,7 +58,7 @@ uninstall:
 	rm -f $(BINDIR)/$(TARGET)
 
 clean:
-	rm -f $(CLI_OBJ) $(TETRIS_OBJ) $(TARGET) *.gcda *.gcno *.gcov
+	rm -f $(CLI_OBJ) $(TETRIS_OBJ) $(TARGET) $(LIB_TETRIS) *.gcda *.gcno *.gcov
 
 test:
 	@echo "Running tests..."

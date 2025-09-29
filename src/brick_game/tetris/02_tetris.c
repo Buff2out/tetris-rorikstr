@@ -54,28 +54,32 @@ GameInfo_t updateCurrentState() {
     LOG_FUNCTION_START("updateCurrentState", "");
     
     GameState_t* state = get_game_state();
-    switch (state->state) {
-        case Init:
-            do_init();
-            break;
-        case Spawn:
-            do_spawn();
-            break;
-        case Move:
-            do_move();
-            break;
-        case Moving:
-            do_moving();
-            break;
-        case Attaching:
-            do_attaching();
-            break;
-        case GameOver:
-            do_gameover();
-            break;
+    
+    // Обновляем логику игры только если игра не на паузе (кроме GameOver)
+    if (!state->info->pause || state->state == GameOver) {
+        switch (state->state) {
+            case Init:
+                do_init();
+                break;
+            case Spawn:
+                do_spawn();
+                break;
+            case Move:
+                do_move();
+                break;
+            case Moving:
+                do_moving();
+                break;
+            case Attaching:
+                do_attaching();
+                break;
+            case GameOver:
+                do_gameover();
+                break;
+        }
     }
 
-    // Копируем state->field в info->field
+    // Подготовка данных для отображения
     for (int i = 0; i < FIELD_HEIGHT; i++) {
         for (int j = 0; j < FIELD_WIDTH; j++) {
             state->info->field[i][j] = state->field[i][j];
@@ -103,8 +107,6 @@ GameInfo_t updateCurrentState() {
         }
     }
 
-    state->info->pause = 0;
-    
     LOG_FUNCTION_END("updateCurrentState", "score=%d, level=%d, state=%d", 
                      state->info->score, state->info->level, state->state);
     

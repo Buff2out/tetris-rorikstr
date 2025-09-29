@@ -1,22 +1,14 @@
 #include "01_automato.h"
-#include "../../logging.h"
 
 void do_attaching(void) {
     GameState_t* state = get_game_state();
-    // Закрепляем фигуру на поле
     place_figure();
-
-    // Удаляем линии
     clear_lines();
-
-    // Проверяем GameOver
     if (is_game_over()) {
         state->state = GameOver;
     } else {
         state->state = Spawn;
     }
-    
-    LOG_FUNCTION_END("do_attaching", "state=%d", state->state);
 }
 
 int check_collision() {
@@ -30,17 +22,15 @@ int check_collision() {
                 int y = fig->y + i;
 
                 if (x < 0 || x >= FIELD_WIDTH || y >= FIELD_HEIGHT) {
-                    return 1;  // коллизия
+                    return 1;
                 }
                 if (y >= 0 && state->field[y][x]) {
-                    return 1;  // коллизия с другой фигурой
+                    return 1;
                 }
             }
         }
     }
-    
-    LOG_FUNCTION_END("check_collision", "no collision");
-    return 0;  // нет коллизии
+    return 0;
 }
 
 void place_figure() {
@@ -78,33 +68,26 @@ void clear_lines() {
             }
         }
         if (full) {
-            // Сдвигаем строки вниз
             for (int y = i; y > 0; --y) {
                 for (int x = 0; x < FIELD_WIDTH; ++x) {
                     state->field[y][x] = state->field[y - 1][x];
                 }
             }
-            // Очищаем верхнюю строку
             for (int x = 0; x < FIELD_WIDTH; ++x) {
                 state->field[0][x] = 0;
             }
             lines_cleared++;
-            i++;  // проверяем эту строку снова
+            i++;
         }
     }
 
-    // Начисление очков
     if (lines_cleared > 0) {
         int points[] = {0, 100, 300, 700, 1500};
         int old_score = state->info->score;
         state->info->score += points[lines_cleared];
-        
-        // Обновляем рекорд, если нужно
         if (state->info->score > state->info->high_score) {
             state->info->high_score = state->info->score;
         }
-        
-        // Увеличиваем уровень каждые 600 очков (максимум 10 уровней)
         int new_level = (state->info->score / 600) + 1;
         if (new_level > 10) new_level = 10;
         
@@ -112,16 +95,7 @@ void clear_lines() {
             state->info->level = new_level;
             
             state->info->speed += new_level * 5;
-            
-            LOG_FUNCTION_END("clear_lines", "lines_cleared=%d, score=%d->%d, level=%d->%d, speed=%d->%d", 
-                             lines_cleared, old_score, state->info->score, old_level, state->info->level, 
-                             old_speed, state->info->speed);
             return;
         }
     }
-    
-    // Добавим лог, даже если линии не очищались
-    LOG_FUNCTION_END("clear_lines", "lines_cleared=%d, score=%d->%d, level=%d->%d, speed=%d->%d", 
-                     lines_cleared, state->info->score, state->info->score, old_level, state->info->level, 
-                     old_speed, state->info->speed);
 }

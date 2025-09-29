@@ -1,15 +1,12 @@
 #include "01_automato.h"
-#include "../../logging.h"
 
 void do_moving(void) {
     GameState_t* state = get_game_state();
-    LOG_FUNCTION_START("do_moving", "moving_type=%d", state->moving_type);
 
     switch (state->moving_type) {
         case LeftDown:
         case RightDown:
         case Rotate:
-            // Обработка движения/поворота
             Figure_t old = state->curr;
             switch (state->moving_type) {
                 case LeftDown:
@@ -29,18 +26,17 @@ void do_moving(void) {
                     break;
             }
             if (check_collision()) {
-                state->curr = old;  // откат
+                state->curr = old;
             }
             state->state = Move;
             break;
 
         case ToDown:
-            // Мгновенное падение: двигаем вниз, пока не упрёмся
             while (!check_collision()) {
                 state->curr.y++;
             }
-            state->curr.y--;  // откат на 1 назад, чтобы убрать последний шаг, вызвавший коллизию
-            state->state = Attaching;  // сразу в Attaching
+            state->curr.y--;
+            state->state = Attaching;
             break;
 
         case DoNothing:
@@ -48,7 +44,4 @@ void do_moving(void) {
             break;
     }
     state->state = Move;
-    
-    LOG_FUNCTION_END("do_moving", "curr=(%d,%d), state=%d", 
-                     state->curr.x, state->curr.y, state->state);
 }

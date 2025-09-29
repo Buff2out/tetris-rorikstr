@@ -1,13 +1,12 @@
 #include "01_automato.h"
 #include <stdlib.h>
-#include "../../logging.h"
 
 int load_high_score() {
     FILE* file = fopen("high_score.txt", "r");
     int high_score = 0;
     if (file) {
         if (fscanf(file, "%d", &high_score) != 1) {
-            high_score = 0;  // Если не удалось прочитать, устанавливаем 0
+            high_score = 0;
         }
         fclose(file);
     }
@@ -27,29 +26,23 @@ GameState_t* get_game_state(void) {
     static int initialized = 0;
 
     if (!initialized) {
-        // Выделяем память для GameInfo_t
         state.info = malloc(sizeof(GameInfo_t));
-
-        // Выделяем память для field
         state.info->field = malloc(FIELD_HEIGHT * sizeof(int*));
         for (int i = 0; i < FIELD_HEIGHT; i++) {
             state.info->field[i] = malloc(FIELD_WIDTH * sizeof(int));
         }
 
-        // Выделяем память для next
         state.info->next = malloc(4 * sizeof(int*));
         for (int i = 0; i < 4; i++) {
             state.info->next[i] = malloc(4 * sizeof(int));
         }
-
-        // Инициализируем начальные значения
         state.info->speed = 10;
         state.info->score = 0;
         state.info->level = 1;
         state.info->pause = 0;
         state.frame_count = 0;
         state.last_move_frame = 0;
-        state.info->high_score = load_high_score();  // Загружаем рекорд
+        state.info->high_score = load_high_score();
         
         // Инициализируем следующую фигуру
         state.next.sprite = rand() % FIGURE_COUNT;
@@ -67,8 +60,6 @@ GameState_t* get_game_state(void) {
 }
 
 void terminate_and_free() {
-    LOG_FUNCTION_START("terminate_and_free", "");
-    
     GameState_t* state = get_game_state();
 
     if (state->info) {
@@ -97,6 +88,4 @@ void terminate_and_free() {
         free(state->info);
         state->info = NULL;
     }
-    
-    LOG_FUNCTION_END("terminate_and_free", "");
 }

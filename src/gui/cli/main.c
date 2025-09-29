@@ -2,15 +2,10 @@
 #include <time.h>
 #include <unistd.h>
 #include "../../brick_game/tetris/00_tetris.h"
-#include "../../logging.h"
 
 void display_game(GameInfo_t game_state);
 
-// gui/cli/main.c
 int main() {
-    init_logger();
-    LOG_FUNCTION_START("main", "");
-    
     initscr();
     cbreak();
     noecho();
@@ -82,14 +77,11 @@ int main() {
         }
 
         if (running) {
-            GameInfo_t game_state = updateCurrentState();  // Обновляем состояние
-            display_game(game_state);  // Отображаем состояние
+            GameInfo_t game_state = updateCurrentState();
+            display_game(game_state);
         }
     }
 
     endwin();
-    
-    LOG_FUNCTION_END("main", "");
-    close_logger();
     return 0;
 }

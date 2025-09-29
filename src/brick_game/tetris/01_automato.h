@@ -14,6 +14,13 @@ typedef enum {
 } Automato_t;
 
 typedef enum {
+    RightDown,
+    LeftDown,
+    Rotate,
+    DoNothing
+} Moving_t;
+
+typedef enum {
     I = 0,
     J,
     L,
@@ -22,31 +29,32 @@ typedef enum {
     T,
     Z,
     FIGURE_COUNT
-} FigureType;
+} Sprite_t;
 
 typedef struct {
     int x, y;           // Позиция фигуры на поле
     int mtrx[4][4];     // сама матрица
-    FigureType type;    // Тип фигуры
+    Sprite_t sprite;    // Тип фигуры
     int rotation;       // Поворот (0–3)
-} Figure;
+} Figure_t;
 
 typedef struct {
-    Figure curr;
-    Figure next;
+    Figure_t curr;
+    Figure_t next;
     Automato_t state;
+    Moving_t moving_type;
     int field[FIELD_HEIGHT][FIELD_WIDTH];
-    int score;
-    int high_score;
-    int level;
-    int speed;
-    long long last_time;
+    // int score; // НЕ НУЖЕН, это уже есть в GameInfo_t
+    // int high_score; // НЕ НУЖЕН, это уже есть в GameInfo_t
+    // int level; // НЕ НУЖЕН, это уже есть в GameInfo_t
+    // int speed; // НЕ НУЖЕН, это уже есть в GameInfo_t
+    long long last_time; // нужно пояснение для чего это
 } GameState_t;
 
 GameState_t* get_game_state(void);
 
 // Функции состояний
-void do_start(void);
+void do_init(void);
 void do_spawn(void);
 void do_move(void);
 void do_moving(void);
@@ -54,13 +62,13 @@ void do_attaching(void);
 void do_gameover(void);
 
 // Вспомогательные
-void place_figure_on_field();
+void place_figure();
 int check_collision();
 void clear_lines();
 int is_game_over();
 
 // Функции фигур
-const int (*get_figure_shape(FigureType type, int rotation))[4];
+const int (*get_figure_shape(Sprite_t sprite, int rotation))[4];
 
 // Остальные фигуры...
 const int (*i_fig_up())[4];

@@ -9,11 +9,11 @@ void do_spawn(void) {
     state->curr.y = 0;
 
     // Генерим следующую фигуру
-    state->next.type = rand() % FIGURE_COUNT;
+    state->next.sprite = rand() % FIGURE_COUNT;
     state->next.rotation = 0;
-    const int (*shape)[4] = get_figure_shape(state->next.type, 0);
-    for (int i = 0; i < 4; i++)
-        for (int j = 0; j < 4; j++)
+    const int (*shape)[4] = get_figure_shape(state->next.sprite, 0);
+    for (int i = 0; i < 4; ++i)
+        for (int j = 0; j < 4; ++j)
             state->next.mtrx[i][j] = shape[i][j];
 
     // Проверка на GameOver

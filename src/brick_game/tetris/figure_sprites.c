@@ -1,9 +1,9 @@
 #include "01_automato.h"
 #include <string.h>
 
-const int (*get_figure_shape(FigureType type, int rotation))[4] {
+const int (*get_figure_shape(Sprite_t sprite, int rotation))[4] {
     const int (*result)[4] = NULL;
-    switch (type) {
+    switch (sprite) {
         case I:
             switch (rotation % 4) {
                 case 0: result =  i_fig_up(); break;

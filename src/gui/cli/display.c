@@ -1,6 +1,6 @@
 // src/gui/cli/display.c
 #include <ncurses.h>
-#include "../../brick_game/tetris/tetris.h"
+#include "../../brick_game/tetris/00_tetris.h"
 
 void display_game() {
     printf("DEBUG: display_game called\n");
@@ -12,8 +12,8 @@ void display_game() {
            game_state.field, game_state.next);
 
     // Отображение игрового поля
-    for (int i = 0; i < FIELD_HEIGHT; i++) {
-        for (int j = 0; j < FIELD_WIDTH; j++) {
+    for (int i = 0; i < FIELD_HEIGHT; ++i) {
+        for (int j = 0; j < FIELD_WIDTH; ++j) {
             if (game_state.field[i][j] == 2) {
                 mvaddch(i + 1, j * 2 + 1, '#');  // Закрепленные блоки
             } else if (game_state.field[i][j] == 1) {
@@ -27,8 +27,8 @@ void display_game() {
     // Отображение следующей фигуры
     mvaddstr(1, FIELD_WIDTH * 2 + 5, "Next figure:");
     
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
             if (game_state.next[i][j]) {
                 mvaddch(i + 3, (FIELD_WIDTH * 2 + 5) + j * 2, '@');
             } else {

@@ -1,5 +1,4 @@
 #include "01_automato.h"
-#include <stdlib.h>
 
 int load_high_score() {
     FILE* file = fopen("high_score.txt", "r");
@@ -43,14 +42,6 @@ GameState_t* get_game_state(void) {
         state.frame_count = 0;
         state.last_move_frame = 0;
         state.info->high_score = load_high_score();
-        
-        // Инициализируем следующую фигуру
-        state.next.sprite = rand() % FIGURE_COUNT;
-        state.next.rotation = 0;
-        const int (*shape)[4] = get_figure_shape(state.next.sprite, 0);
-        for (int i = 0; i < 4; ++i)
-            for (int j = 0; j < 4; ++j)
-                state.next.mtrx[i][j] = shape[i][j];
 
         state.state = GameOver;
         initialized = 1;

@@ -1,10 +1,5 @@
 // brick_game/tetris/06_move.c
-#include <time.h>
 #include "01_automato.h"
-
-long long get_time_ms() {
-    return (long long)time(NULL) * 1000;
-}
 
 void do_move(void) {
     GameState_t* state = get_game_state();

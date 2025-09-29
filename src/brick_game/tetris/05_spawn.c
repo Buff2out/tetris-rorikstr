@@ -1,5 +1,4 @@
 #include "01_automato.h"
-#include <stdlib.h>
 
 void do_spawn(void) {
     GameState_t* state = get_game_state();

@@ -1,5 +1,4 @@
 #include "01_automato.h"
-#include <string.h>
 
 const int (*get_figure_shape(Sprite_t sprite, int rotation))[4] {
     const int (*result)[4] = NULL;

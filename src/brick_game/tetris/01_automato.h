@@ -3,6 +3,7 @@
 
 #include "00_tetris.h"
 #include <stdbool.h>
+#include <stdlib.h>
 
 typedef enum {
     Init,

@@ -1,10 +1,9 @@
 #include "01_automato.h"
 
 void userInput(UserAction_t action, bool hold) {
-    (void)hold;  // заглушка
+    (void)hold;
     GameState_t* state = get_game_state();
 
-    // Если игра на паузе, обрабатываются только определенные команды
     if (state->info->pause && 
         (action == Left || action == Right || action == Down || action == Up || 
          action == Action || action == Start)) {
@@ -13,6 +12,10 @@ void userInput(UserAction_t action, bool hold) {
 
     switch (action) {
         case Start:
+            if (state->info->score > state->info->high_score) {
+                state->info->high_score = state->info->score;
+                save_high_score(state->info->high_score);
+            }
             state->info->high_score = load_high_score();
             state->state = Init;
             break;
@@ -44,7 +47,7 @@ void userInput(UserAction_t action, bool hold) {
             break;
         default:
             break;
-    }   
+    }
 }
 
 GameInfo_t updateCurrentState() {

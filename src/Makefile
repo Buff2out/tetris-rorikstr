@@ -24,9 +24,7 @@ CLIDIR = gui/cli
 
 # Файлы
 TETRIS_SRC = $(shell find $(TETRISDIR) -name "*.c")
-LOGGING_SRC = logging.c
-LOGGING_OBJ = logging.o
-TETRIS_OBJ = $(TETRIS_SRC:.c=.o) $(LOGGING_OBJ)
+TETRIS_OBJ = $(TETRIS_SRC:.c=.o)
 CLI_SRC = $(shell find $(CLIDIR) -name "*.c")
 CLI_OBJ = $(CLI_SRC:.c=.o)
 
@@ -63,7 +61,7 @@ uninstall:
 	rm -f $(BINDIR)/$(TARGET)
 
 clean:
-	rm -f $(CLI_OBJ) $(TETRIS_OBJ) $(TARGET) $(LIB_TETRIS) *.gcda *.gcno *.gcov tetris.log
+	rm -f $(CLI_OBJ) $(TETRIS_OBJ) $(TARGET) $(LIB_TETRIS) *.gcda *.gcno *.gcov
 
 test:
 	@echo "Running tests..."

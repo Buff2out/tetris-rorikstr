@@ -54,8 +54,6 @@ void place_figure() {
 void clear_lines() {
     
     GameState_t* state = get_game_state();
-    int old_level = state->info->level;
-    int old_speed = state->info->speed;
     
     int lines_cleared = 0;
 
@@ -83,7 +81,6 @@ void clear_lines() {
 
     if (lines_cleared > 0) {
         int points[] = {0, 100, 300, 700, 1500};
-        int old_score = state->info->score;
         state->info->score += points[lines_cleared];
         if (state->info->score > state->info->high_score) {
             state->info->high_score = state->info->score;
@@ -94,7 +91,7 @@ void clear_lines() {
         if (new_level > state->info->level) {
             state->info->level = new_level;
             
-            state->info->speed += new_level * 5;
+            state->info->speed = new_level * 10;
             return;
         }
     }

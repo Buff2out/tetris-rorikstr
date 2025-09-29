@@ -1,5 +1,4 @@
 #include <ncurses.h>
-#include <time.h>
 #include <unistd.h>
 #include "../../brick_game/tetris/00_tetris.h"
 

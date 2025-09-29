@@ -6,7 +6,7 @@ void do_moving(void) {
     switch (state->moving_type) {
         case LeftDown:
         case RightDown:
-        case Rotate:
+        case (Rotate): {
             Figure_t old = state->curr;
             switch (state->moving_type) {
                 case LeftDown:
@@ -30,7 +30,7 @@ void do_moving(void) {
             }
             state->state = Move;
             break;
-
+        }
         case ToDown:
             while (!check_collision()) {
                 state->curr.y++;

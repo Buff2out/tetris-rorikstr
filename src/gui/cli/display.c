@@ -1,23 +1,19 @@
 // src/gui/cli/display.c
 #include <ncurses.h>
 #include "../../brick_game/tetris/00_tetris.h"
+#include "../../logging.h"
 
-void display_game() {
+// display.c
+void display_game(GameInfo_t game_state) {
+    LOG_FUNCTION_START("display_game", "");
+    
     clear();
 
-    GameInfo_t game_state = updateCurrentState();
-    
-    // Проверяем, является ли состояние GameOver
-    if (game_state.next[0][0] == 0 && game_state.next[0][1] == 0 && game_state.next[0][2] == 0 && game_state.next[0][3] == 0) {
-        mvprintw(FIELD_HEIGHT / 2, FIELD_WIDTH - 4, "GAME OVER");
-        refresh();
-        return;
-    }
-
-    // Проверяем pause
+    // Убираем проверку на GameOver из display
     if (game_state.pause) {
-        mvprintw(FIELD_HEIGHT / 2, FIELD_WIDTH - 4, "PAUSED");
+        mvprintw(FIELD_HEIGHT / 2, FIELD_WIDTH * 2 + 1, "PAUSED");
         refresh();
+        LOG_FUNCTION_END("display_game", "paused");
         return;
     }
 
@@ -53,9 +49,11 @@ void display_game() {
     mvprintw(FIELD_HEIGHT + 5, 1, "Speed: %d", game_state.speed);
     
     if (game_state.pause) {
-        mvprintw(FIELD_HEIGHT / 2, FIELD_WIDTH - 4, "PAUSED");
+        mvprintw(FIELD_HEIGHT / 2, FIELD_WIDTH * 2 + 1, "PAUSED");
     }
 
     refresh();
-    printf("DEBUG: display_game completed\n");
+    
+    LOG_FUNCTION_END("display_game", "score=%d, level=%d", 
+                     game_state.score, game_state.level);
 }

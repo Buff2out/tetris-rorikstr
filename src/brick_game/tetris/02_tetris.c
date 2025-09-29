@@ -1,8 +1,18 @@
 #include "01_automato.h"
+#include "../../logging.h"
 
 void userInput(UserAction_t action, bool hold) {
+    LOG_FUNCTION_START("userInput", "action=%d, hold=%d", action, hold);
+    
     (void)hold;  // заглушка
     GameState_t* state = get_game_state();
+
+    // Команды движения игнорируются до первого спавна (пока state = Init или первый Spawn)
+    if ((state->state == Init || state->state == Spawn) && 
+        (action == Left || action == Right || action == Down || action == Up || action == Action)) {
+        LOG_FUNCTION_END("userInput", "ignored movement command during initialization, state=%d", state->state);
+        return;
+    }
 
     switch (action) {
         case Start:
@@ -36,9 +46,13 @@ void userInput(UserAction_t action, bool hold) {
         default:
             break;
     }
+    
+    LOG_FUNCTION_END("userInput", "state=%d", state->state);
 }
 
 GameInfo_t updateCurrentState() {
+    LOG_FUNCTION_START("updateCurrentState", "");
+    
     GameState_t* state = get_game_state();
     switch (state->state) {
         case Init:
@@ -61,13 +75,28 @@ GameInfo_t updateCurrentState() {
             break;
     }
 
-    // Копируем данные в уже выделенную память
+    // Копируем state->field в info->field
     for (int i = 0; i < FIELD_HEIGHT; i++) {
         for (int j = 0; j < FIELD_WIDTH; j++) {
             state->info->field[i][j] = state->field[i][j];
         }
     }
 
+    // Накладываем активную фигуру на поле
+    Figure_t* fig = &state->curr;
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            if (fig->mtrx[i][j]) {
+                int x = fig->x + j;
+                int y = fig->y + i;
+                if (y >= 0 && y < FIELD_HEIGHT && x >= 0 && x < FIELD_WIDTH) {
+                    state->info->field[y][x] = 1;  // активная фигура
+                }
+            }
+        }
+    }
+
+    // Копируем next
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
             state->info->next[i][j] = state->next.mtrx[i][j];
@@ -75,5 +104,9 @@ GameInfo_t updateCurrentState() {
     }
 
     state->info->pause = 0;
+    
+    LOG_FUNCTION_END("updateCurrentState", "score=%d, level=%d, state=%d", 
+                     state->info->score, state->info->level, state->state);
+    
     return *state->info;
 }

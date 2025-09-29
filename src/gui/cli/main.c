@@ -1,23 +1,40 @@
-// src/gui/cli/main.c
 #include <ncurses.h>
 #include <time.h>
 #include <unistd.h>
 #include "../../brick_game/tetris/00_tetris.h"
+#include "../../logging.h"
 
-void display_game();
+void display_game(GameInfo_t game_state);
 
+// gui/cli/main.c
 int main() {
+    init_logger();
+    LOG_FUNCTION_START("main", "");
+    
     initscr();
     cbreak();
     noecho();
     keypad(stdscr, TRUE);
-    nodelay(stdscr, TRUE);
+    nodelay(stdscr, FALSE);
     curs_set(0);
 
+    // Цикл ожидания нажатия F/f
+    mvprintw(FIELD_HEIGHT / 2, FIELD_WIDTH - 4, "Press F to Start");
+    refresh();
+
+    int ch = 0;
+    while (1) {
+        ch = getch();
+        if (ch == 'f' || ch == 'F') {
+            userInput(Start, false);
+            break;
+        }
+    }
+
+    nodelay(stdscr, TRUE);
     timeout(100);
 
-    int ch;
-    UserAction_t current_action;
+    UserAction_t current_action = {0};
     bool action_valid = false;
     bool running = true;
     
@@ -64,12 +81,15 @@ int main() {
             userInput(current_action, false);
         }
 
-        if (running) {  // Обновляем состояние только если не завершаемся
-            updateCurrentState();
-            display_game();
+        if (running) {
+            GameInfo_t game_state = updateCurrentState();  // Обновляем состояние
+            display_game(game_state);  // Отображаем состояние
         }
     }
 
     endwin();
+    
+    LOG_FUNCTION_END("main", "");
+    close_logger();
     return 0;
 }

@@ -24,7 +24,9 @@ CLIDIR = gui/cli
 
 # Файлы
 TETRIS_SRC = $(shell find $(TETRISDIR) -name "*.c")
-TETRIS_OBJ = $(TETRIS_SRC:.c=.o)
+LOGGING_SRC = logging.c
+LOGGING_OBJ = logging.o
+TETRIS_OBJ = $(TETRIS_SRC:.c=.o) $(LOGGING_OBJ)
 CLI_SRC = $(shell find $(CLIDIR) -name "*.c")
 CLI_OBJ = $(CLI_SRC:.c=.o)
 
@@ -51,6 +53,9 @@ brick_game/tetris/%.o: brick_game/tetris/%.c
 gui/cli/%.o: gui/cli/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
 install: $(TARGET)
 	install -m 755 $(TARGET) $(BINDIR)/
 
@@ -58,7 +63,7 @@ uninstall:
 	rm -f $(BINDIR)/$(TARGET)
 
 clean:
-	rm -f $(CLI_OBJ) $(TETRIS_OBJ) $(TARGET) $(LIB_TETRIS) *.gcda *.gcno *.gcov
+	rm -f $(CLI_OBJ) $(TETRIS_OBJ) $(TARGET) $(LIB_TETRIS) *.gcda *.gcno *.gcov tetris.log
 
 test:
 	@echo "Running tests..."

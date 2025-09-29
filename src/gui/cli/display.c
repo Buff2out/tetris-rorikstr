@@ -9,15 +9,7 @@ void display_game(GameInfo_t game_state) {
     
     clear();
 
-    // Убираем проверку на GameOver из display
-    if (game_state.pause) {
-        mvprintw(FIELD_HEIGHT / 2, FIELD_WIDTH * 2 + 1, "PAUSED");
-        refresh();
-        LOG_FUNCTION_END("display_game", "paused");
-        return;
-    }
-
-    // Отображение игрового поля
+    // Отображение игрового поля (всегда, даже во время паузы)
     for (int i = 0; i < FIELD_HEIGHT; ++i) {
         for (int j = 0; j < FIELD_WIDTH; ++j) {
             if (game_state.field[i][j] == 2) {
@@ -48,12 +40,13 @@ void display_game(GameInfo_t game_state) {
     mvprintw(FIELD_HEIGHT + 4, 1, "Level: %d", game_state.level);
     mvprintw(FIELD_HEIGHT + 5, 1, "Speed: %d", game_state.speed);
     
+    // Показываем надпись "PAUSED" если игра на паузе
     if (game_state.pause) {
         mvprintw(FIELD_HEIGHT / 2, FIELD_WIDTH * 2 + 1, "PAUSED");
     }
 
     refresh();
     
-    LOG_FUNCTION_END("display_game", "score=%d, level=%d", 
-                     game_state.score, game_state.level);
+    LOG_FUNCTION_END("display_game", "score=%d, level=%d, pause=%d", 
+                     game_state.score, game_state.level, game_state.pause);
 }

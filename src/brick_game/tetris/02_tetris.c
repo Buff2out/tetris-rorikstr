@@ -54,6 +54,8 @@ GameInfo_t updateCurrentState() {
     LOG_FUNCTION_START("updateCurrentState", "");
     
     GameState_t* state = get_game_state();
+
+    state->frame_count++;
     
     // Обновляем логику игры только если игра не на паузе (кроме GameOver)
     if (!state->info->pause || state->state == GameOver) {

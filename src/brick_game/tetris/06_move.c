@@ -12,19 +12,18 @@ void do_move(void) {
     LOG_FUNCTION_START("do_move", "speed=%d, moving_type=%d, current_pos=(%d,%d)", 
                        state->info->speed, state->moving_type, state->curr.x, state->curr.y);
 
-    // Добавляем проверку, чтобы избежать деления на ноль
-    if (state->info->speed <= 0) {
-        state->info->speed = 100;  // Устанавливаем минимальное значение
+    // Рассчитываем, сколько кадров должно пройти между движениями
+    int frames_to_wait = (state->moving_type == ToDown) ? 1 : (1000 / state->info->speed);
+
+    // Проверяем, прошло ли достаточно кадров
+    if (state->frame_count - state->last_move_frame < frames_to_wait) {
+        LOG_FUNCTION_END("do_move", "not enough frames passed, frame_count=%lld, last_move_frame=%lld, frames_to_wait=%d", 
+                         state->frame_count, state->last_move_frame, frames_to_wait);
+        return;
     }
 
-    long long current_time = get_time_ms();
-    int delay = (state->moving_type == ToDown) ? 50 : (1000 / state->info->speed);
-
-    if (current_time - state->last_time < delay) {
-        LOG_FUNCTION_END("do_move", "not enough time passed, delay=%ld ms, current_time=%ld, state->last_time=%ld, difference=%ld", delay, current_time, state->last_time, current_time - state->last_time);
-        return;  // ещё не время
-    }
-    state->last_time = current_time;
+    // Обновляем время последнего движения
+    state->last_move_frame = state->frame_count;
 
     // Двигаем вниз
     state->curr.y++;
@@ -33,6 +32,6 @@ void do_move(void) {
         state->state = Attaching;  // переход в Attaching
     }
     
-    LOG_FUNCTION_END("do_move", "moved to (%d,%d), state=%d, delay=%d ms", 
-                     state->curr.x, state->curr.y, state->state, delay);
+    LOG_FUNCTION_END("do_move", "moved to (%d,%d), state=%d", 
+                     state->curr.x, state->curr.y, state->state);
 }

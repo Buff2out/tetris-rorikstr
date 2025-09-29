@@ -12,7 +12,7 @@ void do_init(void) {
 
     state->info->score = 0;
     state->info->level = 1;
-    state->info->speed = 100;
+    state->info->speed = 10;
     state->state = Spawn;
     
     LOG_FUNCTION_END("do_init", "score=%d, level=%d, state=%d", 

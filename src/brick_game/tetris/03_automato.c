@@ -43,10 +43,12 @@ GameState_t* get_game_state(void) {
         }
 
         // Инициализируем начальные значения
-        state.info->speed = 100;
+        state.info->speed = 10;
         state.info->score = 0;
         state.info->level = 1;
         state.info->pause = 0;
+        state.frame_count = 0;
+        state.last_move_frame = 0;
         state.info->high_score = load_high_score();  // Загружаем рекорд
         
         // Инициализируем следующую фигуру

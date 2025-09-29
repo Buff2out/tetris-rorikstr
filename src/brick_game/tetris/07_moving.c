@@ -47,6 +47,7 @@ void do_moving(void) {
             state->state = Move;
             break;
     }
+    state->state = Move;
     
     LOG_FUNCTION_END("do_moving", "curr=(%d,%d), state=%d", 
                      state->curr.x, state->curr.y, state->state);

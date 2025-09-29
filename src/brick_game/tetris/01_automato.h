@@ -46,7 +46,8 @@ typedef struct {
     Moving_t moving_type;
     int field[FIELD_HEIGHT][FIELD_WIDTH];
     GameInfo_t* info;
-    long long last_time;
+    long long frame_count;  // Общий счётчик кадров
+    long long last_move_frame;  // Кадр, когда фигура последний раз двигалась
 } GameState_t;
 
 GameState_t* get_game_state(void);

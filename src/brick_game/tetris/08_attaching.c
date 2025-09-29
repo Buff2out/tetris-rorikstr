@@ -111,8 +111,7 @@ void clear_lines() {
         if (new_level > state->info->level) {
             state->info->level = new_level;
             
-            // СУПЕР-УСКОРЕНИЕ! В 50 раз быстрее!
-            state->info->speed = new_level * 50;
+            state->info->speed += new_level * 5;
             
             LOG_FUNCTION_END("clear_lines", "lines_cleared=%d, score=%d->%d, level=%d->%d, speed=%d->%d", 
                              lines_cleared, old_score, state->info->score, old_level, state->info->level, 

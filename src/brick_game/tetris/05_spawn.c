@@ -9,6 +9,7 @@ void do_spawn(void) {
     state->curr = state->next;
     state->curr.x = FIELD_WIDTH / 2 - 2;
     state->curr.y = 0;
+    state->moving_type = DoNothing;
 
     // Генерим новую следующую фигуру
     state->next.sprite = rand() % FIGURE_COUNT;

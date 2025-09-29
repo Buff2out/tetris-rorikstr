@@ -45,7 +45,7 @@ typedef struct {
     Automato_t state;
     Moving_t moving_type;
     int field[FIELD_HEIGHT][FIELD_WIDTH];
-    GameInfo_t info;
+    GameInfo_t* info;
     long long last_time;
 } GameState_t;
 

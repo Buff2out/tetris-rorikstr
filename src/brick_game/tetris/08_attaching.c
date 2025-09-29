@@ -87,10 +87,10 @@ void clear_lines() {
     // Начисление очков
     if (lines_cleared > 0) {
         int points[] = {0, 100, 300, 700, 1500};
-        state->info.score += points[lines_cleared];
-        if (state->info.score / 600 > state->info.level - 1) {
-            state->info.level++;
-            state->info.speed = state->info.level;
+        state->info->score += points[lines_cleared];
+        if (state->info->score / 600 > state->info->level - 1) {
+            state->info->level++;
+            state->info->speed = state->info->level;
         }
     }
 }

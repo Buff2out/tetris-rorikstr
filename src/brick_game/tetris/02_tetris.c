@@ -9,8 +9,8 @@ void userInput(UserAction_t action, bool hold) {
             state->state = Init;
             break;
         case Terminate:
-            if (state->info.score > state->info.high_score) {
-                state->info.high_score = state->info.score;
+            if (state->info->score > state->info->high_score) {
+                state->info->high_score = state->info->score;
             }
             state->state = GameOver;
             break;
@@ -31,7 +31,7 @@ void userInput(UserAction_t action, bool hold) {
             state->moving_type = ToDown;
             break;
         case Pause:
-            state->info.pause = !state->info.pause;
+            state->info->pause = !state->info->pause;
             break;
         default:
             break;
@@ -61,9 +61,19 @@ GameInfo_t updateCurrentState() {
             break;
     }
 
-    GameInfo_t info = state->info;
-    info.field = (int**)state->field;
-    info.next = (int**)state->next.mtrx;
-    info.pause = 0;
-    return info;
+    // Копируем данные в уже выделенную память
+    for (int i = 0; i < FIELD_HEIGHT; i++) {
+        for (int j = 0; j < FIELD_WIDTH; j++) {
+            state->info->field[i][j] = state->field[i][j];
+        }
+    }
+
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            state->info->next[i][j] = state->next.mtrx[i][j];
+        }
+    }
+
+    state->info->pause = 0;
+    return *state->info;
 }

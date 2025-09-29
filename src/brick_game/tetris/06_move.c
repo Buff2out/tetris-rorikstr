@@ -10,7 +10,7 @@ void do_move(void) {
 
     long long current_time = get_time_ms();
 
-    int delay = (state->moving_type == ToDown) ? 50 : (1000 / state->info.speed);
+    int delay = (state->moving_type == ToDown) ? 50 : (1000 / state->info->speed);
 
     if (current_time - state->last_time < delay) {
         return;  // ещё не время

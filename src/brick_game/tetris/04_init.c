@@ -7,8 +7,8 @@ void do_init(void) {
         for (int j = 0; j < FIELD_WIDTH; ++j)
             state->field[i][j] = 0;
 
-    state->info.score = 0;
-    state->info.level = 1;
-    state->info.speed = 1;
+    state->info->score = 0;
+    state->info->level = 1;
+    state->info->speed = 1;
     state->state = Spawn;
 }

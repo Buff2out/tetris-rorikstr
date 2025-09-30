@@ -1,7 +1,7 @@
 #include "01_automato.h"
 
 int load_high_score() {
-    FILE* file = fopen("high_score.txt", "r");
+    FILE* file = fopen("build/high_score.txt", "r");
     int high_score = 0;
     if (file) {
         if (fscanf(file, "%d", &high_score) != 1) {
@@ -13,7 +13,7 @@ int load_high_score() {
 }
 
 void save_high_score(int score) {
-    FILE* file = fopen("high_score.txt", "w");
+    FILE* file = fopen("build/high_score.txt", "w");
     if (file) {
         fprintf(file, "%d", score);
         fclose(file);

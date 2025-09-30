@@ -58,6 +58,7 @@ GameState_t* get_game_state(void);
 void do_init(void);
 int load_high_score();
 void save_high_score(int score);
+void generate_next_figure(void);
 
 // spawn
 void do_spawn(void);
@@ -77,7 +78,6 @@ void clear_lines();
 // gameover
 void do_gameover(void);
 int is_game_over();
-
 
 // Функции фигур
 const int (*get_figure_shape(Sprite_t sprite, int rotation))[4];
@@ -109,6 +109,5 @@ const int (*z_fig_right())[4];
 const int (*z_fig_down())[4];
 const int (*z_fig_left())[4];
 const int (*empty_fig())[4];
-
 
 #endif

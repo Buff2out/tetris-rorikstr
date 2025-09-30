@@ -58,3 +58,4 @@ ginpee.toml
 src/ginpee.toml
 .vscode/launch.json
 src/tetris.log
+src/high_score.txt

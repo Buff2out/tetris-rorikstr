@@ -22,10 +22,10 @@ int check_collision() {
                 int y = fig->y + i;
 
                 if (x < 0 || x >= FIELD_WIDTH || y >= FIELD_HEIGHT) {
-                    return 1;
+                    return 1; // TODO
                 }
                 if (y >= 0 && state->field[y][x]) {
-                    return 1;
+                    return 1; // TODO
                 }
             }
         }
@@ -34,7 +34,6 @@ int check_collision() {
 }
 
 void place_figure() {
-    
     GameState_t* state = get_game_state();
     Figure_t* fig = &state->curr;
 
@@ -51,10 +50,20 @@ void place_figure() {
     }
 }
 
-void clear_lines() {
-    
+void shift_lines_down(int from_row) {
     GameState_t* state = get_game_state();
-    
+    for (int y = from_row; y > 0; --y) {
+        for (int x = 0; x < FIELD_WIDTH; ++x) {
+            state->field[y][x] = state->field[y - 1][x];
+        }
+    }
+    for (int x = 0; x < FIELD_WIDTH; ++x) {
+        state->field[0][x] = 0;
+    }
+}
+
+void clear_lines() {
+    GameState_t* state = get_game_state();
     int lines_cleared = 0;
 
     for (int i = FIELD_HEIGHT - 1; i >= 0; --i) {
@@ -62,20 +71,13 @@ void clear_lines() {
         for (int j = 0; j < FIELD_WIDTH; ++j) {
             if (state->field[i][j] != 2) {
                 full = 0;
-                break;
+                break; // TODO
             }
         }
         if (full) {
-            for (int y = i; y > 0; --y) {
-                for (int x = 0; x < FIELD_WIDTH; ++x) {
-                    state->field[y][x] = state->field[y - 1][x];
-                }
-            }
-            for (int x = 0; x < FIELD_WIDTH; ++x) {
-                state->field[0][x] = 0;
-            }
+            shift_lines_down(i);
             lines_cleared++;
-            i++;
+            i++;  // Check the same row again after shifting
         }
     }
 
@@ -90,9 +92,7 @@ void clear_lines() {
         
         if (new_level > state->info->level) {
             state->info->level = new_level;
-            
             state->info->speed = new_level * 10;
-            return;
         }
     }
 }

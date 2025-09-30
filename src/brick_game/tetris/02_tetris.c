@@ -12,7 +12,7 @@ void userInput(UserAction_t action, bool hold) {
 
     switch (action) {
         case Start:
-            if (state->info->score > state->info->high_score) {
+            if (state->info->score >= state->info->high_score) {
                 state->info->high_score = state->info->score;
                 save_high_score(state->info->high_score);
             }

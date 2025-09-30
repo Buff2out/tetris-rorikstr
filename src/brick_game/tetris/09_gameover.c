@@ -19,7 +19,7 @@ int is_game_over() {
     GameState_t* state = get_game_state();
     for (int j = 0; j < FIELD_WIDTH; ++j) {
         if (state->field[0][j] || state->field[1][j]) {
-            return 1;
+            return 1; // TODO
         }
     }
     

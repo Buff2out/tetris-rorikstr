@@ -2,7 +2,7 @@
 
 # Автоопределение компилятора и флагов
 CC ?= gcc
-CFLAGS ?= -Wall -Wextra -std=c11 -g
+CFLAGS ?= -Wall -Wextra -std=c11 -g -D_POSIX_C_SOURCE=199309L
 CHECK_CFLAGS ?= -I/usr/include/check
 
 # Проверяем наличие библиотек

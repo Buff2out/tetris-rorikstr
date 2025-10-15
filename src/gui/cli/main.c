@@ -2,7 +2,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <time.h>
-#include "../../brick_game/tetris/00_tetris.h"  // Только этот хедер!
+#include "../../brick_game/tetris/00_tetris.h"
 
 void display_game(GameInfo_t game_state);
 
@@ -20,11 +20,12 @@ int main() {
     refresh();
 
     int ch = 0;
-    while (1) {
+    int started = 0;
+    while (!started) {
         ch = getch();
         if (ch == 'f' || ch == 'F') {
             userInput(Start, false);
-            break;
+            started = 1;
         }
     }
 
@@ -39,39 +40,30 @@ int main() {
         ch = getch();
         action_valid = false;
 
-        switch (ch) {
-            case 'q': 
-                userInput(Terminate, false);  // Это освободит память через бэкенд
-                running = false;
-                break;
-            case 'r': case ' ': 
-                current_action = Action; 
-                action_valid = true; 
-                break;
-            case KEY_LEFT: 
-                current_action = Left; 
-                action_valid = true; 
-                break;
-            case KEY_RIGHT: 
-                current_action = Right; 
-                action_valid = true; 
-                break;
-            case KEY_DOWN: 
-                current_action = Down; 
-                action_valid = true; 
-                break;
-            case KEY_UP: 
-                current_action = Up; 
-                action_valid = true; 
-                break;
-            case 's': case 'S': 
-                current_action = Start; 
-                action_valid = true; 
-                break;
-            case 'p': case 'P': 
-                current_action = Pause; 
-                action_valid = true; 
-                break;
+        if (ch == 'q') {
+            userInput(Terminate, false);
+            running = false;
+        } else if (ch == 'r' || ch == ' ') {
+            current_action = Action;
+            action_valid = true;
+        } else if (ch == KEY_LEFT) {
+            current_action = Left;
+            action_valid = true;
+        } else if (ch == KEY_RIGHT) {
+            current_action = Right;
+            action_valid = true;
+        } else if (ch == KEY_DOWN) {
+            current_action = Down;
+            action_valid = true;
+        } else if (ch == KEY_UP) {
+            current_action = Up;
+            action_valid = true;
+        } else if (ch == 's' || ch == 'S') {
+            current_action = Start;
+            action_valid = true;
+        } else if (ch == 'p' || ch == 'P') {
+            current_action = Pause;
+            action_valid = true;
         }
         
         if (action_valid) {

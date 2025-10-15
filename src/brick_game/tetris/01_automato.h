@@ -1,12 +1,12 @@
 #ifndef AUTOMATO_H
 #define AUTOMATO_H
 
-#define _POSIX_C_SOURCE 199309L  // Добавляем здесь для POSIX
+#define _POSIX_C_SOURCE 199309L
 
 #include "00_tetris.h"
 #include <stdbool.h>
 #include <stdlib.h>
-#include <time.h>  // Для clock_gettime
+#include <time.h>
 
 typedef enum {
     Init,
@@ -50,8 +50,11 @@ typedef struct {
     Moving_t moving_type;
     int field[FIELD_HEIGHT][FIELD_WIDTH];
     GameInfo_t* info;
-    long long last_move_time;      // Время последнего движения (мс)
-    long long pause_start_time;    // Время начала паузы (мс)
+    long long last_move_time;
+    long long pause_start_time;
+    long long attach_start_time;     // Время начала attach
+    int attach_completed;            // Флаг завершения attach (фигура размещена)
+    int down_key_was_released;
 } GameState_t;
 
 GameState_t* get_game_state(void);
@@ -61,9 +64,8 @@ void do_init(void);
 int load_high_score();
 void save_high_score(int score);
 void generate_next_figure(void);
-void terminate_and_free(void);  // Добавляем прототип здесь
+void terminate_and_free(void);
 
-// Вспомогательная функция для времени
 long long get_current_time_ms(void);
 
 // spawn

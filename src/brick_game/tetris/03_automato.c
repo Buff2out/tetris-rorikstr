@@ -47,6 +47,9 @@ GameState_t* get_game_state(void) {
         state.info->pause = 0;
         state.last_move_time = get_current_time_ms();
         state.pause_start_time = 0;
+        state.attach_start_time = 0;
+        state.attach_completed = 0;
+        state.down_key_was_released = 1;
         state.info->high_score = load_high_score();
 
         state.state = GameOver;

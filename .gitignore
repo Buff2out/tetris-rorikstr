@@ -60,3 +60,4 @@ src/ginpee.toml
 src/tetris.log
 src/high_score.txt
 src/build/high_score.txt
+code-samples/frogger/project.md

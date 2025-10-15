@@ -92,7 +92,7 @@ void clear_lines() {
         
         if (new_level > state->info->level) {
             state->info->level = new_level;
-            state->info->speed = new_level * 10;
+            state->info->speed = new_level * 3;
         }
     }
 }

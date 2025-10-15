@@ -1,9 +1,12 @@
 #ifndef AUTOMATO_H
 #define AUTOMATO_H
 
+#define _POSIX_C_SOURCE 199309L  // Добавляем здесь для POSIX
+
 #include "00_tetris.h"
 #include <stdbool.h>
 #include <stdlib.h>
+#include <time.h>  // Для clock_gettime
 
 typedef enum {
     Init,
@@ -34,10 +37,10 @@ typedef enum {
 } Sprite_t;
 
 typedef struct {
-    int x, y;           // Позиция фигуры на поле
-    int mtrx[4][4];     // сама матрица
-    Sprite_t sprite;    // Тип фигуры
-    int rotation;       // Поворот (0–3)
+    int x, y;
+    int mtrx[4][4];
+    Sprite_t sprite;
+    int rotation;
 } Figure_t;
 
 typedef struct {
@@ -47,18 +50,21 @@ typedef struct {
     Moving_t moving_type;
     int field[FIELD_HEIGHT][FIELD_WIDTH];
     GameInfo_t* info;
-    long long frame_count;  // Общий счётчик кадров
-    long long last_move_frame;  // Кадр, когда фигура последний раз двигалась
+    long long last_move_time;      // Время последнего движения (мс)
+    long long pause_start_time;    // Время начала паузы (мс)
 } GameState_t;
 
 GameState_t* get_game_state(void);
 
 // Функции состояний
-// init
 void do_init(void);
 int load_high_score();
 void save_high_score(int score);
 void generate_next_figure(void);
+void terminate_and_free(void);  // Добавляем прототип здесь
+
+// Вспомогательная функция для времени
+long long get_current_time_ms(void);
 
 // spawn
 void do_spawn(void);
@@ -82,7 +88,6 @@ int is_game_over();
 // Функции фигур
 const int (*get_figure_shape(Sprite_t sprite, int rotation))[4];
 
-// Остальные фигуры...
 const int (*i_fig_up())[4];
 const int (*i_fig_right())[4];
 const int (*i_fig_down())[4];

@@ -24,6 +24,7 @@ void userInput(UserAction_t action, bool hold) {
                 state->info->high_score = state->info->score;
                 save_high_score(state->info->high_score);
             }
+            terminate_and_free();  // Освобождаем память здесь - единственное место
             state->state = GameOver;
             break;
         case Left:
@@ -43,6 +44,12 @@ void userInput(UserAction_t action, bool hold) {
             state->moving_type = ToDown;
             break;
         case Pause:
+            if (!state->info->pause) {
+                state->pause_start_time = get_current_time_ms();
+            } else {
+                long long pause_duration = get_current_time_ms() - state->pause_start_time;
+                state->last_move_time += pause_duration;
+            }
             state->info->pause = !state->info->pause;
             break;
         default:
@@ -52,8 +59,6 @@ void userInput(UserAction_t action, bool hold) {
 
 GameInfo_t updateCurrentState() {
     GameState_t* state = get_game_state();
-
-    state->frame_count++;
     
     if (!state->info->pause || state->state == GameOver) {
         switch (state->state) {
@@ -91,7 +96,7 @@ GameInfo_t updateCurrentState() {
                 int x = fig->x + j;
                 int y = fig->y + i;
                 if (y >= 0 && y < FIELD_HEIGHT && x >= 0 && x < FIELD_WIDTH) {
-                    state->info->field[y][x] = 1;  // активная фигура
+                    state->info->field[y][x] = 1;
                 }
             }
         }

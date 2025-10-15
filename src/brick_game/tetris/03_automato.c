@@ -1,5 +1,11 @@
 #include "01_automato.h"
 
+long long get_current_time_ms(void) {
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return ts.tv_sec * 1000LL + ts.tv_nsec / 1000000LL;
+}
+
 int load_high_score() {
     FILE* file = fopen("build/high_score.txt", "r");
     int high_score = 0;
@@ -35,12 +41,12 @@ GameState_t* get_game_state(void) {
         for (int i = 0; i < 4; i++) {
             state.info->next[i] = malloc(4 * sizeof(int));
         }
-        state.info->speed = 10;
+        state.info->speed = 1;
         state.info->score = 0;
         state.info->level = 1;
         state.info->pause = 0;
-        state.frame_count = 0;
-        state.last_move_frame = 0;
+        state.last_move_time = get_current_time_ms();
+        state.pause_start_time = 0;
         state.info->high_score = load_high_score();
 
         state.state = GameOver;

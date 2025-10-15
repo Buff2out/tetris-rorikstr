@@ -1,10 +1,14 @@
 #include <ncurses.h>
 #include <unistd.h>
-#include "../../brick_game/tetris/00_tetris.h"
+#include <stdlib.h>
+#include <time.h>
+#include "../../brick_game/tetris/00_tetris.h"  // Только этот хедер!
 
 void display_game(GameInfo_t game_state);
 
 int main() {
+    srand(time(NULL));
+    
     initscr();
     cbreak();
     noecho();
@@ -12,7 +16,6 @@ int main() {
     nodelay(stdscr, FALSE);
     curs_set(0);
 
-    // Цикл ожидания нажатия F/f
     mvprintw(FIELD_HEIGHT / 2, FIELD_WIDTH - 4, "Press F to Start");
     refresh();
 
@@ -38,7 +41,7 @@ int main() {
 
         switch (ch) {
             case 'q': 
-                userInput(Terminate, false);
+                userInput(Terminate, false);  // Это освободит память через бэкенд
                 running = false;
                 break;
             case 'r': case ' ': 

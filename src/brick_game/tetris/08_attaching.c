@@ -15,7 +15,7 @@ void do_attaching(void) {
         }
         
         // Проверяем, прошло ли 350мс
-        if (current_time - state->attach_start_time >= 350) {
+        if (current_time - state->attach_start_time >= ATTACH_DELAY_MS) {
             state->attach_completed = 1;
             state->attach_start_time = 0;  // Сбрасываем таймер
             
@@ -108,21 +108,21 @@ void clear_lines() {
     }
 
     if (lines_cleared > 0) {
-        int points[] = {0, 100, 300, 700, 1500};
+        int points[] = {0, POINTS_ONE_LINE, POINTS_TWO_LINES, POINTS_THREE_LINES, POINTS_FOUR_LINES};
         state->info->score += points[lines_cleared];
         
         if (state->info->score > state->info->high_score) {
             state->info->high_score = state->info->score;
         }
         
-        int new_level = (state->info->score / 600) + 1;
-        if (new_level > 10) {
-            new_level = 10;
+        int new_level = (state->info->score / SCORE_PER_LEVEL) + 1;
+        if (new_level > MAX_LEVEL) {
+            new_level = MAX_LEVEL;
         }
         
         if (new_level > state->info->level) {
             state->info->level = new_level;
-            state->info->speed = new_level * 3;
+            state->info->speed = new_level + (new_level / 2);
         }
     }
 }

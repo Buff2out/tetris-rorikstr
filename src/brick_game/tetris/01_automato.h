@@ -8,6 +8,21 @@
 #include <stdlib.h>
 #include <time.h>
 
+// Константы времени
+#define ATTACH_DELAY_MS 350
+#define INSTANT_DROP_DELAY_MS 30
+#define BASE_FALL_DELAY_MS 1100
+#define SPEED_MULTIPLIER_MS 100
+#define MAX_LEVEL 10
+
+// Константы очков
+#define SCORE_PER_LEVEL 600
+#define POINTS_ONE_LINE 100
+#define POINTS_TWO_LINES 300
+#define POINTS_THREE_LINES 700
+#define POINTS_FOUR_LINES 1500
+
+
 typedef enum {
     Init,
     Spawn,

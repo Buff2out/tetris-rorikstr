@@ -5,10 +5,10 @@ int get_milliseconds_to_wait(void) {
     int result = 0;
     
     if (state->moving_type == ToDown) {
-        result = 30;
+        result = INSTANT_DROP_DELAY_MS;
     } else {
-        int base_delay = 1100 - (state->info->speed * 100);
-        result = (base_delay > 100) ? base_delay : 100;
+        int base_delay = BASE_FALL_DELAY_MS - (state->info->speed * SPEED_MULTIPLIER_MS);
+        result = (base_delay > SPEED_MULTIPLIER_MS) ? base_delay : SPEED_MULTIPLIER_MS;
     }
     
     return result;

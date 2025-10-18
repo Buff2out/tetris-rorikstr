@@ -1,8 +1,7 @@
-.PHONY: all clean valgrind test style format gcov_report all install uninstall
+.PHONY: all clean install uninstall test gcov_report dvi dist run style format
 
-# Автоопределение компилятора и флагов
 CC ?= gcc
-CFLAGS ?= -Wall -Wextra -std=c11 -g -D_POSIX_C_SOURCE=199309L
+CFLAGS ?= -Wall -Wextra -Werror -std=c11 -g -D_POSIX_C_SOURCE=199309L -MMD -MP
 CHECK_CFLAGS ?= -I/usr/include/check
 
 # Проверяем наличие библиотек
@@ -14,11 +13,7 @@ else
     LDFLAGS ?= -lcheck -lrt -lpthread -lm -lncurses
 endif
 
-SRCDIR = .
-TESTDIR = test
 BUILDDIR = build
-
-# src/Makefile
 TETRISDIR = brick_game/tetris
 CLIDIR = gui/cli
 
@@ -32,10 +27,10 @@ LIB_TETRIS = $(BUILDDIR)/libtetris.a
 TARGET = $(BUILDDIR)/tetris_bin.out
 
 # Установка
-PREFIX ?= /usr/local
+PREFIX ?= $(HOME)/.local
 BINDIR = $(PREFIX)/bin
 
-all: clean $(TARGET)
+all: $(TARGET)
 
 $(LIB_TETRIS): $(TETRIS_OBJ)
 	mkdir -p $(BUILDDIR)
@@ -43,7 +38,6 @@ $(LIB_TETRIS): $(TETRIS_OBJ)
 
 $(TARGET): $(LIB_TETRIS) $(CLI_OBJ)
 	$(CC) $(CLI_OBJ) -L$(BUILDDIR) -ltetris -o $@ $(LDFLAGS)
-	rm -f $(CLI_OBJ) $(TETRIS_OBJ)
 
 brick_game/tetris/%.o: brick_game/tetris/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -51,36 +45,51 @@ brick_game/tetris/%.o: brick_game/tetris/%.c
 gui/cli/%.o: gui/cli/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-%.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
 install: $(TARGET)
-	install -m 755 $(TARGET) $(BINDIR)/
+	install -m 755 $(TARGET) $(BINDIR)/tetris_bin.out
 
 uninstall:
-	rm -f $(BINDIR)/$(TARGET)
+	rm -f $(BINDIR)/tetris_bin.out
 
 clean:
-	rm -f $(CLI_OBJ) $(TETRIS_OBJ) $(TARGET) $(LIB_TETRIS) *.gcda *.gcno *.gcov
+	rm -rf $(CLI_OBJ) $(TETRIS_OBJ) $(TARGET) $(LIB_TETRIS)
+	rm -rf $(BUILDDIR)/*.gcda $(BUILDDIR)/*.gcno *.gcda *.gcno *.gcov $(TETRISDIR)/*.d $(CLIDIR)/*.d
+	rm -rf coverage.info coverage_report
 
-test:
-	@echo "Running tests..."
-	# Здесь будет вызов тестов, если они есть
+test: $(LIB_TETRIS)
+	$(CC) $(CFLAGS) test/test.c -L$(BUILDDIR) -ltetris $(LDFLAGS) -o $(BUILDDIR)/test.out
+	./$(BUILDDIR)/test.out
 
 gcov_report: CFLAGS += --coverage
+gcov_report: LDFLAGS += --coverage
 gcov_report: clean $(TARGET)
-	./$(TARGET)
+	@echo "Note: Run automated tests for proper coverage"
 	gcov $(TETRIS_SRC)
 	lcov --capture --directory . --output-file coverage.info
 	genhtml coverage.info --output-directory coverage_report
-	@echo "Coverage report generated in coverage_report/index.html"
+	@echo "Coverage report: coverage_report/index.html"
+
+dvi:
+	doxygen Doxyfile 2>/dev/null || echo "Doxyfile not found"
+
+dist: clean
+	tar -czf tetris.tar.gz Makefile $(TETRISDIR) $(CLIDIR) README.md
+
+run: $(TARGET)
+	./$(TARGET)
 
 style:
-	@cp ../materials/linters/.clang-format .
-	@clang-format -n *.c *.h
-	@rm .clang-format
+	@if [ -f .clang-format ]; then \
+		clang-format -n $(TETRIS_SRC) $(CLI_SRC); \
+	else \
+		echo ".clang-format not found"; \
+	fi
 
 format:
-	cp ../materials/linters/.clang-format .
-	clang-format -i *.c *.h
-	rm .clang-format
+	@if [ -f .clang-format ]; then \
+		clang-format -i $(TETRIS_SRC) $(CLI_SRC); \
+	else \
+		echo ".clang-format not found"; \
+	fi
+
+-include $(TETRIS_OBJ:.o=.d) $(CLI_OBJ:.o=.d)

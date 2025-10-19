@@ -35,12 +35,12 @@ TEST_TARGET = $(BUILDDIR)/test.out
 PREFIX ?= $(HOME)/.local
 BINDIR = $(PREFIX)/bin
 
-all: dvi dist install gcov_report run
+all: gcov_report dvi
 
 run: clean $(TARGET)
 	./$(TARGET)
 
-install: $(TARGET)
+install: clean $(TARGET)
 	mkdir -p $(BINDIR)
 	install -m 755 $(TARGET) $(BINDIR)/tetris
 	@echo "installed $(BINDIR)/tetris"
@@ -97,7 +97,7 @@ dvi:
 	xdg-open $(DVI_DIR)/html/index.html
 
 dist: clean
-	tar -czf tetris.tar.gz Makefile $(TETRISDIR) $(CLIDIR) $(TESTDIR) README.md doc.md
+	tar -czf tetris.tar.gz Makefile $(TETRISDIR) $(CLIDIR) $(TESTDIR) ../README.md doc.md
 
 style:
 	@if [ -f ../materials/linters/.clang-format ]; then \

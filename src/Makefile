@@ -35,7 +35,7 @@ TEST_TARGET = $(BUILDDIR)/test.out
 PREFIX ?= $(HOME)/.local
 BINDIR = $(PREFIX)/bin
 
-all: $(TARGET)
+all: dvi dist install gcov_report run
 
 run: clean $(TARGET)
 	./$(TARGET)
@@ -100,14 +100,14 @@ dist: clean
 	tar -czf tetris.tar.gz Makefile $(TETRISDIR) $(CLIDIR) $(TESTDIR) README.md doc.md
 
 style:
-	@if [ -f .clang-format ]; then \
+	@if [ -f ../materials/linters/.clang-format ]; then \
 		clang-format -n $(TETRIS_SRC) $(CLI_SRC); \
 	else \
 		echo ".clang-format not found"; \
 	fi
 
 format:
-	@if [ -f .clang-format ]; then \
+	@if [ -f ../materials/linters/.clang-format ]; then \
 		clang-format -i $(TETRIS_SRC) $(CLI_SRC); \
 	else \
 		echo ".clang-format not found"; \

@@ -62,3 +62,5 @@ src/high_score.txt
 src/build/high_score.txt
 code-samples/frogger/project.md
 dvi/
+gcov_report/
+build/

@@ -36,25 +36,17 @@ BINDIR = $(PREFIX)/bin
 
 all: $(TARGET)
 
-$(LIB_TETRIS): $(TETRIS_OBJ)
-	mkdir -p $(BUILDDIR)
-	ar rcs $@ $^
-
-$(TARGET): $(LIB_TETRIS) $(CLI_OBJ)
-	$(CC) $(CLI_OBJ) -L$(BUILDDIR) -ltetris -o $@ $(LDFLAGS)
-
-brick_game/tetris/%.o: brick_game/tetris/%.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-gui/cli/%.o: gui/cli/%.c
-	$(CC) $(CFLAGS) -c $< -o $@
+run: $(TARGET)
+	./$(TARGET)
 
 install: $(TARGET)
 	mkdir -p $(BINDIR)
 	install -m 755 $(TARGET) $(BINDIR)/tetris
+	@echo "installed $(BINDIR)/tetris"
 
 uninstall:
 	rm -f $(BINDIR)/tetris
+	@echo "uninstalled $(BINDIR)/tetris"
 
 clean:
 	rm -rf $(CLI_OBJ) $(TETRIS_OBJ) $(TARGET) $(LIB_TETRIS) $(TEST_TARGET)
@@ -70,11 +62,12 @@ gcov_report: LDFLAGS += --coverage
 gcov_report: clean test
 	@mkdir -p $(GCOV_DIR)
 	gcov $(TETRIS_SRC) -o $(TETRISDIR)
-	lcov --capture --directory . --output-file $(GCOV_DIR)/coverage.info
-	lcov --remove $(GCOV_DIR)/coverage.info '/usr/*' '*/nix/store/*' -o $(GCOV_DIR)/coverage.info
+	lcov --capture --directory $(TETRISDIR) --output-file $(GCOV_DIR)/coverage.info --ignore-errors unused
+	lcov --extract $(GCOV_DIR)/coverage.info '*/brick_game/tetris/*' -o $(GCOV_DIR)/coverage.info --ignore-errors unused
 	genhtml $(GCOV_DIR)/coverage.info --output-directory $(GCOV_DIR)
-	mv *.gcov $(GCOV_DIR)/ 2>/dev/null || true
+	@mv *.gcov $(GCOV_DIR)/ 2>/dev/null || true
 	@echo "Report: $(GCOV_DIR)/index.html"
+	xdg-open $(GCOV_DIR)/index.html
 
 dvi:
 	@mkdir -p $(DVI_DIR)
@@ -92,9 +85,6 @@ dvi:
 dist: clean
 	tar -czf tetris.tar.gz Makefile $(TETRISDIR) $(CLIDIR) $(TESTDIR) README.md doc.md
 
-run: $(TARGET)
-	./$(TARGET)
-
 style:
 	@if [ -f .clang-format ]; then \
 		clang-format -n $(TETRIS_SRC) $(CLI_SRC); \
@@ -108,5 +98,18 @@ format:
 	else \
 		echo ".clang-format not found"; \
 	fi
+
+$(LIB_TETRIS): $(TETRIS_OBJ)
+	mkdir -p $(BUILDDIR)
+	ar rcs $@ $^
+
+$(TARGET): $(LIB_TETRIS) $(CLI_OBJ)
+	$(CC) $(CLI_OBJ) -L$(BUILDDIR) -ltetris -o $@ $(LDFLAGS)
+
+brick_game/tetris/%.o: brick_game/tetris/%.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+gui/cli/%.o: gui/cli/%.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 -include $(TETRIS_OBJ:.o=.d) $(CLI_OBJ:.o=.d)

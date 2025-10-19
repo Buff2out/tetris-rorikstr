@@ -66,3 +66,4 @@ code-samples/frogger/project.md
 dvi/
 gcov_report/
 build/
+src/tetris.tar.gz

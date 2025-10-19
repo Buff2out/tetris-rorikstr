@@ -16,6 +16,9 @@ endif
 BUILDDIR = build
 TETRISDIR = brick_game/tetris
 CLIDIR = gui/cli
+TESTDIR = test
+GCOV_DIR = gcov_report
+DVI_DIR = dvi
 
 # Файлы
 TETRIS_SRC = $(shell find $(TETRISDIR) -name "*.c")
@@ -25,6 +28,7 @@ CLI_OBJ = $(CLI_SRC:.c=.o)
 
 LIB_TETRIS = $(BUILDDIR)/libtetris.a
 TARGET = $(BUILDDIR)/tetris_bin.out
+TEST_TARGET = $(BUILDDIR)/test.out
 
 # Установка
 PREFIX ?= $(HOME)/.local
@@ -46,34 +50,42 @@ gui/cli/%.o: gui/cli/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 install: $(TARGET)
-	install -m 755 $(TARGET) $(BINDIR)/tetris_bin.out
+	mkdir -p $(BINDIR)
+	install -m 755 $(TARGET) $(BINDIR)/tetris
 
 uninstall:
-	rm -f $(BINDIR)/tetris_bin.out
+	rm -f $(BINDIR)/tetris
 
 clean:
-	rm -rf $(CLI_OBJ) $(TETRIS_OBJ) $(TARGET) $(LIB_TETRIS)
-	rm -rf $(BUILDDIR)/*.gcda $(BUILDDIR)/*.gcno *.gcda *.gcno *.gcov $(TETRISDIR)/*.d $(CLIDIR)/*.d
-	rm -rf coverage.info coverage_report
+	rm -rf $(CLI_OBJ) $(TETRIS_OBJ) $(TARGET) $(LIB_TETRIS) $(TEST_TARGET)
+	rm -rf $(TETRISDIR)/*.d $(CLIDIR)/*.d
+	rm -rf $(GCOV_DIR) $(DVI_DIR)
 
 test: $(LIB_TETRIS)
-	$(CC) $(CFLAGS) test/test.c -L$(BUILDDIR) -ltetris $(LDFLAGS) -o $(BUILDDIR)/test.out
-	./$(BUILDDIR)/test.out
+	$(CC) $(CFLAGS) $(TESTDIR)/test.c -L$(BUILDDIR) -ltetris $(LDFLAGS) -o $(TEST_TARGET)
+	./$(TEST_TARGET)
 
 gcov_report: CFLAGS += --coverage
 gcov_report: LDFLAGS += --coverage
-gcov_report: clean $(TARGET)
-	@echo "Note: Run automated tests for proper coverage"
-	gcov $(TETRIS_SRC)
-	lcov --capture --directory . --output-file coverage.info
-	genhtml coverage.info --output-directory coverage_report
-	@echo "Coverage report: coverage_report/index.html"
+gcov_report: clean test
+	@mkdir -p $(GCOV_DIR)
+	gcov $(TETRIS_SRC) -o $(TETRISDIR)
+	lcov --capture --directory . --output-file $(GCOV_DIR)/coverage.info
+	lcov --remove $(GCOV_DIR)/coverage.info '/usr/*' '*/nix/store/*' -o $(GCOV_DIR)/coverage.info
+	genhtml $(GCOV_DIR)/coverage.info --output-directory $(GCOV_DIR)
+	mv *.gcov $(GCOV_DIR)/ 2>/dev/null || true
+	@echo "Report: $(GCOV_DIR)/index.html"
 
 dvi:
-	doxygen Doxyfile 2>/dev/null || echo "Doxyfile not found"
+	@mkdir -p $(DVI_DIR)
+	@cp doc.md $(DVI_DIR)/ 2>/dev/null || echo "doc.md not found"
+	@if command -v doxygen >/dev/null 2>&1 && [ -f Doxyfile ]; then \
+		doxygen Doxyfile; \
+	fi
+	@echo "Documentation in $(DVI_DIR)/"
 
 dist: clean
-	tar -czf tetris.tar.gz Makefile $(TETRISDIR) $(CLIDIR) README.md
+	tar -czf tetris.tar.gz Makefile $(TETRISDIR) $(CLIDIR) $(TESTDIR) README.md doc.md
 
 run: $(TARGET)
 	./$(TARGET)

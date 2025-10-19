@@ -78,11 +78,16 @@ gcov_report: clean test
 
 dvi:
 	@mkdir -p $(DVI_DIR)
-	@cp doc.md $(DVI_DIR)/ 2>/dev/null || echo "doc.md not found"
-	@if command -v doxygen >/dev/null 2>&1 && [ -f Doxyfile ]; then \
-		doxygen Doxyfile; \
+	@echo "Generating documentation with Doxygen..."
+	@if command -v doxygen >/dev/null 2>&1; then \
+		doxygen Doxyfile && echo "HTML docs: $(DVI_DIR)/html/index.html"; \
+	else \
+		echo "Error: Doxygen not found. Install: nix-shell -p doxygen"; \
+		echo "Copying doc.md as fallback..."; \
+		cp doc.md $(DVI_DIR)/; \
 	fi
-	@echo "Documentation in $(DVI_DIR)/"
+	xdg-open dvi/html/index.html
+
 
 dist: clean
 	tar -czf tetris.tar.gz Makefile $(TETRISDIR) $(CLIDIR) $(TESTDIR) README.md doc.md

@@ -1,6 +1,7 @@
 #ifndef TEST_HELPER_H
 #define TEST_HELPER_H
 
+#include <check.h>
 #include "../brick_game/tetris/01_automato.h"
 
 // Хелпер для очистки поля

@@ -1,4 +1,3 @@
-#include <check.h>
 #include "test_helper.h"
 
 START_TEST(test_collision_bottom) {

@@ -21,7 +21,7 @@
       }
     }
   },
-  "postCreateCommand": "DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y gcc make libncurses-dev check lcov doxygen gdb valgrind clang-format git xdg-utils",
+  "postCreateCommand": "apt-get update && apt-get install -y gcc make libncurses-dev check lcov doxygen gdb valgrind clang-format git xdg-utils",
   "remoteUser": "root",
   "mounts": [
     "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"

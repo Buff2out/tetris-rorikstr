@@ -101,14 +101,14 @@ dist: clean
 
 style:
 	@if [ -f ../materials/linters/.clang-format ]; then \
-		clang-format -n $(TETRIS_SRC) $(CLI_SRC); \
+		clang-format -n $(TETRIS_SRC) $(CLI_SRC) $(TEST_SRC); \
 	else \
 		echo ".clang-format not found"; \
 	fi
 
 format:
 	@if [ -f ../materials/linters/.clang-format ]; then \
-		clang-format -i $(TETRIS_SRC) $(CLI_SRC); \
+		clang-format -i $(TETRIS_SRC) $(CLI_SRC) $(TEST_SRC); \
 	else \
 		echo ".clang-format not found"; \
 	fi

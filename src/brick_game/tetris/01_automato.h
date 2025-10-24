@@ -8,14 +8,12 @@
 #include <stdlib.h>
 #include <time.h>
 
-// Константы времени
 #define ATTACH_DELAY_MS 350
 #define INSTANT_DROP_DELAY_MS 30
 #define BASE_FALL_DELAY_MS 1100
 #define SPEED_MULTIPLIER_MS 100
 #define MAX_LEVEL 10
 
-// Константы очков
 #define SCORE_PER_LEVEL 600
 #define POINTS_ONE_LINE 100
 #define POINTS_TWO_LINES 300
@@ -67,14 +65,13 @@ typedef struct {
     GameInfo_t* info;
     long long last_move_time;
     long long pause_start_time;
-    long long attach_start_time;     // Время начала attach
-    int attach_completed;            // Флаг завершения attach (фигура размещена)
+    long long attach_start_time;
+    int attach_completed;
     int down_key_was_released;
 } GameState_t;
 
 GameState_t* get_game_state(void);
 
-// Функции состояний
 void do_init(void);
 int load_high_score();
 void save_high_score(int score);
@@ -83,26 +80,20 @@ void terminate_and_free(void);
 
 long long get_current_time_ms(void);
 
-// spawn
 void do_spawn(void);
 
-// move
 void do_move(void);
 
-//moving
 void do_moving(void);
 
-// attaching
 void do_attaching(void);
 int check_collision();
 void place_figure();
 void clear_lines();
 
-// gameover
 void do_gameover(void);
 int is_game_over();
 
-// Функции фигур
 const int (*get_figure_shape(Sprite_t sprite, int rotation))[4];
 
 const int (*i_fig_up())[4];

@@ -4,7 +4,6 @@ void do_attaching(void) {
   GameState_t *state = get_game_state();
   long long current_time = get_current_time_ms();
 
-  // Если только что вошли в Attaching - размещаем фигуру и запускаем таймер
   if (!state->attach_completed) {
     // Первый вход в Attaching
     if (state->attach_start_time == 0) {

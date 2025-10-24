@@ -6,7 +6,6 @@ void userInput(UserAction_t action, bool hold) {
 
   int should_process = 1;
 
-  // Проверка паузы
   if (state->info->pause) {
     if (action == Left || action == Right || action == Down || action == Up ||
         action == Action || action == Start) {
@@ -14,7 +13,6 @@ void userInput(UserAction_t action, bool hold) {
     }
   }
 
-  // Блокируем движения во время Attaching (до завершения задержки)
   if (state->state == Attaching && !state->attach_completed) {
     if (action == Left || action == Right || action == Down || action == Up ||
         action == Action) {

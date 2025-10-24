@@ -5,7 +5,6 @@ void do_attaching(void) {
   long long current_time = get_current_time_ms();
 
   if (!state->attach_completed) {
-    // Первый вход в Attaching
     if (state->attach_start_time == 0) {
       place_figure();
       clear_lines();
@@ -13,12 +12,10 @@ void do_attaching(void) {
       state->attach_completed = 0;
     }
 
-    // Проверяем, прошло ли 350мс
     if (current_time - state->attach_start_time >= ATTACH_DELAY_MS) {
       state->attach_completed = 1;
-      state->attach_start_time = 0; // Сбрасываем таймер
+      state->attach_start_time = 0;
 
-      // Проверяем game over и переходим
       int game_over = is_game_over();
 
       if (game_over) {
@@ -27,9 +24,8 @@ void do_attaching(void) {
         state->state = Spawn;
       }
 
-      state->attach_completed = 0; // Сбрасываем флаг для следующего attach
+      state->attach_completed = 0;
     }
-    // Иначе остаёмся в Attaching и ждём
   }
 }
 

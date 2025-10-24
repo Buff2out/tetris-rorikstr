@@ -6,7 +6,7 @@ START_TEST(test_collision_bottom_boundary) {
     state->curr.y = FIELD_HEIGHT - 1;
     state->curr.x = 5;
     state->curr.mtrx[0][0] = 1;
-    state->curr.y++; // Выходим за границу
+    state->curr.y++;
     ck_assert_int_eq(check_collision(), 1);
 }
 END_TEST
@@ -21,7 +21,7 @@ END_TEST
 
 START_TEST(test_collision_with_placed_block) {
     GameState_t* state = get_game_state();
-    state->field[10][5] = 2; // Размещённый блок
+    state->field[10][5] = 2;
     state->curr.y = 10;
     state->curr.x = 5;
     state->curr.mtrx[0][0] = 1;
@@ -40,7 +40,7 @@ END_TEST
 
 START_TEST(test_game_over_detection) {
     GameState_t* state = get_game_state();
-    state->field[0][5] = 2; // Блок в верхней строке
+    state->field[0][5] = 2;
     ck_assert_int_eq(is_game_over(), 1);
 }
 END_TEST

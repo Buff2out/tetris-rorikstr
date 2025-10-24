@@ -4,17 +4,16 @@ START_TEST(test_level_up) {
     test_setup();
     GameState_t* state = get_game_state();
     
-    // Набираем 700 очков
     fill_line(FIELD_HEIGHT - 1);
-    clear_lines(); // +100
+    clear_lines();
     
     fill_line(FIELD_HEIGHT - 1);
     fill_line(FIELD_HEIGHT - 2);
-    clear_lines(); // +300 = 400
+    clear_lines();
     
     fill_line(FIELD_HEIGHT - 1);
     fill_line(FIELD_HEIGHT - 2);
-    clear_lines(); // +300 = 700
+    clear_lines();
     
     ck_assert_int_eq(state->info->level, 2);
 }

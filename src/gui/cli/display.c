@@ -3,8 +3,6 @@
 #include <ncurses.h>
 
 void display_game(GameInfo_t game_state) {
-  clear();
-
   for (int i = 0; i < FIELD_HEIGHT; ++i) {
     for (int j = 0; j < FIELD_WIDTH; ++j) {
       if (game_state.field[i][j] == 2) {

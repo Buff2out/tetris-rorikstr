@@ -28,6 +28,7 @@ int main() {
       started = 1;
     }
   }
+  clear();
 
   nodelay(stdscr, TRUE);
   timeout(10);
